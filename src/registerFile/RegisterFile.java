@@ -17,25 +17,25 @@ public class RegisterFile {
 
 
     // getters and setters
-    public Register[] getIntegerRegs() {
-        return integerRegs;
-    }
-    public void setIntegerRegs(Register[] integerRegs) {
-        this.integerRegs = integerRegs;
-    }
-    public Register[] getFloatingRegs() {
-        return floatingRegs;
-    }
-    public void setFloatingRegs(Register[] floatingRegs) {
-        this.floatingRegs = floatingRegs;
-    }
-
-
     public Integer R(int index) {
         return Integer.parseInt(integerRegs[index].getValue());
     }
+    public Integer R(String nameAndOrIndex) {
+        if (nameAndOrIndex.charAt(0) == 'F' ) return null;
+
+        if (nameAndOrIndex.charAt(0) == 'R' ) nameAndOrIndex = nameAndOrIndex.substring(1);
+
+        return Integer.parseInt(integerRegs[Integer.parseInt(nameAndOrIndex)].getValue());
+    }
     public Double F(int index) {
         return Double.parseDouble(floatingRegs[index].getValue());
+    }
+    public Double F(String nameAndOrIndex) {
+        if (nameAndOrIndex.charAt(0) == 'R' ) return null;
+
+        if (nameAndOrIndex.charAt(0) == 'F' ) nameAndOrIndex = nameAndOrIndex.substring(1);
+
+        return Double.parseDouble(floatingRegs[Integer.parseInt(nameAndOrIndex)].getValue());
     }
     public void setR(int index, Integer value) {
         integerRegs[index].setValue(value.toString());
@@ -50,6 +50,19 @@ public class RegisterFile {
         } else {
             return floatingRegs[Integer.parseInt(registerName.substring(1))].getValue();
         }
+    }
+
+    public Register[] getIntegerRegs() {
+        return integerRegs;
+    }
+    public void setIntegerRegs(Register[] integerRegs) {
+        this.integerRegs = integerRegs;
+    }
+    public Register[] getFloatingRegs() {
+        return floatingRegs;
+    }
+    public void setFloatingRegs(Register[] floatingRegs) {
+        this.floatingRegs = floatingRegs;
     }
 
 
