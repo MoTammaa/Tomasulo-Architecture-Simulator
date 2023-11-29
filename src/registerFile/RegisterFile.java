@@ -17,15 +17,15 @@ public class RegisterFile {
 
 
     // getters and setters
-    public Integer R(int index) {
-        return Integer.parseInt(integerRegs[index].getValue());
+    public Long R(int index) {
+        return Long.parseLong(integerRegs[index].getValue());
     }
-    public Integer R(String nameAndOrIndex) {
+    public Long R(String nameAndOrIndex) {
         if (nameAndOrIndex.charAt(0) == 'F' ) return null;
 
         if (nameAndOrIndex.charAt(0) == 'R' ) nameAndOrIndex = nameAndOrIndex.substring(1);
 
-        return Integer.parseInt(integerRegs[Integer.parseInt(nameAndOrIndex)].getValue());
+        return Long.parseLong(integerRegs[Integer.parseInt(nameAndOrIndex)].getValue());
     }
     public Double F(int index) {
         return Double.parseDouble(floatingRegs[index].getValue());
