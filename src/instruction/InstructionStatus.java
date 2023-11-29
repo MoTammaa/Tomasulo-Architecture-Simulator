@@ -5,4 +5,8 @@ public class InstructionStatus {
     private int executionStart;
     private int executionComplete;
     private int writeBack;
+    
+    public void setIssue(int currentCycle) {
+    	this.issue=currentCycle;
+    }
 }
