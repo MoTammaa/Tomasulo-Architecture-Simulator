@@ -12,7 +12,7 @@ public class Tomasulo {
     private ReservationStation[] addSubReservationStations;
     private int totalAddReservationStations;
     private ReservationStation[] mulDivReservationStations;
-    private RegisterStatus[] registerStatus;
+    private RegisterFile registerFile;
     private int totalRegisters;
     private Instruction[] instructions;
     private int totalInstructions;
