@@ -1,5 +1,6 @@
 package engine;
 
+import caches.*;
 import instruction.*;
 import registerFile.*;
 import reservationStations.*;
