@@ -42,7 +42,6 @@ public class Tomasulo {
     private static final int DEFAULT_CYCLES = 2; // Initial value for cycles
 
     public Tomasulo() {
-        // Initialize arrays and other variables
         this.loadBuffers = new LoadStoreBuffer[MAX_LOAD_BUFFERS];
         this.storeBuffers = new LoadStoreBuffer[MAX_STORE_BUFFERS];
         this.addSubReservationStations = new ReservationStation[MAX_ADD_STATIONS];
@@ -50,14 +49,12 @@ public class Tomasulo {
         this.registerStatus = new RegisterStatus[MAX_REGISTERS];
         this.instructions = new Instruction[MAX_INSTRUCTIONS];
 
-        // Initialize other variables
         this.totalLoadBuffers = 0;
         this.totalStoreBuffers = 0;
         this.totalAddReservationStations = 0;
         this.totalRegisters = 0;
         this.totalInstructions = 0;
 
-        // Initialize cycles
         this.totalLoadStoreCycles = DEFAULT_CYCLES;
         this.totalAddSubCycles = DEFAULT_CYCLES;
         this.totalMulCycles = DEFAULT_CYCLES;
@@ -260,7 +257,6 @@ public class Tomasulo {
             case "Div":
                 totalMulCycles++;
                 break;
-            // Add cases for other instruction types if needed
         }
     }
     
@@ -275,28 +271,44 @@ public class Tomasulo {
         tomasulo.printInstructions();
     }
     private Instruction parseInstruction(String line) {
-        // Split the line by spaces to get individual components
-        String[] parts = line.split("\\s+");
+        String[] parts = line.split("\\s*,\\s*|\\s*\\(\\s*|\\s*\\)\\s*|\\s{1,}");
 
-        // Assuming the format is: OPCODE DEST, SRC1, SRC2
-        if (parts.length >= 4) {
+        if (parts.length >= 2) {
             String opcode = parts[0];
             String dest = parts[1];
-            String src1 = parts[2];
-            String src2 = parts[3];
+            String src1 = null;
+            String src2 = null;
+            String immediate = null;
 
-            // Create an Instruction object and set its attributes
-            Instruction Instruction = new Instruction();
-            Instruction.setInstructionType("ADD");
-            Instruction.setRs("R1");
-            Instruction.setRd("R2");
-            Instruction.setRt(3);
-            Instruction.setImmediateOffset(100);
+            if (parts.length >= 3) {
+                src1 = parts[2];
+            }
 
-            return Instruction;
+            if (parts.length >= 4) {
+                src2 = parts[3];
+            }
+
+            if (opcode.equals("LOAD") || opcode.equals("STORE")) {
+                immediate = parts[2];
+                src1 = null;
+            } else if (opcode.equals("ADDI") || opcode.equals("SUBI") || opcode.equals("MULTI") || opcode.equals("DIVI")) {
+                immediate = parts[3];
+            }
+
+            Instruction instruction = new Instruction();
+            instruction.setInstructionType(opcode);
+            instruction.setRs(src1);
+            instruction.setRd(dest);
+            instruction.setRt(src2);
+            instruction.setImmediateOffset(immediate);
+
+            return instruction;
         } else {
             System.out.println("Invalid instruction format: " + line);
             return null;
         }
     }
+
+
+
 }

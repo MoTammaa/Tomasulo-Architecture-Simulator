@@ -4,10 +4,10 @@ public class Instruction {
     private String instructionType;
     private String Rs;
     private String Rd;
-    private int Rt;
-    private int immediateOffset;
+    private String Rt;
+    private String immediateOffset;
     private InstructionStatus instructionStatus;
-
+    
     public String getInstructionType() {
         return instructionType;
     }
@@ -32,19 +32,19 @@ public class Instruction {
         Rd = rd;
     }
 
-    public int getRt() {
+    public String getRt() {
         return Rt;
     }
 
-    public void setRt(int rt) {
+    public void setRt(String rt) {
         Rt = rt;
     }
 
-    public int getImmediateOffset() {
+    public String getImmediateOffset() {
         return immediateOffset;
     }
 
-    public void setImmediateOffset(int immediateOffset) {
+    public void setImmediateOffset(String immediateOffset) {
         this.immediateOffset = immediateOffset;
     }
 
@@ -57,7 +57,6 @@ public class Instruction {
     }
 
     public String toString() {
-        // Provide a meaningful string representation of the instruction
-        return "Type: " + instructionType + ", Rs: " + Rs + ", Rd: " + Rd + ", Rt: " + Rt + ", Immediate: " + immediateOffset;
+        return "Type: " + instructionType + " Rs: " + Rs + " Rd: " + Rd + " Rt: " + Rt + " Immediate: " + immediateOffset;
     }
 }
