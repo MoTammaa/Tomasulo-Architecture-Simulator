@@ -4,10 +4,10 @@ import instruction.Instruction;
 
 public class ReservationStation {
     private String reservationStationName;
-    private boolean isOccupied;
+    private boolean isOccupied=false;
     private String instructionType;
-    private String vj;
-    private String vk;
+    private String Vj;
+    private String Vk;
     private String Qj;
     private String Qk;
     private Instruction instruction;

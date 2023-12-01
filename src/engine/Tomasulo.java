@@ -3,6 +3,8 @@ package engine;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.Arrays;
+
 import caches.*;
 import instruction.*;
 import registerFile.*;
@@ -15,7 +17,8 @@ public class Tomasulo {
     private static final int MAX_MUL_DIV_STATIONS = 10;
     private static final int MAX_REGISTERS = 32;
     private static final int MAX_INSTRUCTIONS = 100;
-
+    private InstructionCache Icache;
+    
     private LoadStoreBuffer[] loadBuffers;
     private int totalLoadBuffers;
 
@@ -37,26 +40,26 @@ public class Tomasulo {
     private int totalMulCycles;
     private int totalDivCycles;
 
-    private static final int DEFAULT_CYCLES = 2; // Initial value for cycles
+    private static final int DEFAULT_CYCLES = 2;
 
     public Tomasulo() {
         this.loadBuffers = new LoadStoreBuffer[MAX_LOAD_BUFFERS];
+        Arrays.fill(loadBuffers, new LoadStoreBuffer());
         this.storeBuffers = new LoadStoreBuffer[MAX_STORE_BUFFERS];
+        Arrays.fill(storeBuffers, new LoadStoreBuffer());
         this.addSubReservationStations = new ReservationStation[MAX_ADD_STATIONS];
+        Arrays.fill(addSubReservationStations, new ReservationStation());
         this.mulDivReservationStations = new ReservationStation[MAX_MUL_DIV_STATIONS];
-        this.registerStatus = new RegisterStatus[MAX_REGISTERS];
+        Arrays.fill(mulDivReservationStations, new ReservationStation());
+        this.registerFile = new RegisterFile(); 
         this.instructions = new Instruction[MAX_INSTRUCTIONS];
-
-        this.totalLoadBuffers = 0;
-        this.totalStoreBuffers = 0;
-        this.totalAddReservationStations = 0;
-        this.totalRegisters = 0;
-        this.totalInstructions = 0;
+        
 
         this.totalLoadStoreCycles = DEFAULT_CYCLES;
         this.totalAddSubCycles = DEFAULT_CYCLES;
         this.totalMulCycles = DEFAULT_CYCLES;
-        this.totalDivCycles = DEFAULT_CYCLES; 
+        this.totalDivCycles = DEFAULT_CYCLES;
+        this.Icache = new InstructionCache(10);
     }
     
         public void loadDataFromFile(String filePath) {
@@ -69,6 +72,9 @@ public class Tomasulo {
                 if (instruction != null) {
                     instructions[instructionIndex] = instruction;
                     instructionIndex++;
+                    Icache.addInstruction(instruction);
+                    issueInstruction(instruction);
+                    System.out.println(getCurrentCycle());
                 }
             }
             totalInstructions = instructionIndex;
@@ -114,9 +120,9 @@ public class Tomasulo {
     }
 
     private LoadStoreBuffer getAvailableLoadStoreBuffer(Instruction instruction) {
-        if (instruction.getInstructionType().equals("Load")) {
+        if (instruction.getInstructionType().equalsIgnoreCase("Load")) {
             return getAvailableLoadBuffer();
-        } else if (instruction.getInstructionType().equals("Store")) {
+        } else if (instruction.getInstructionType().equalsIgnoreCase("Store")) {
             return getAvailableStoreBuffer();
         }
 
@@ -134,11 +140,11 @@ public class Tomasulo {
     
     public void issueInstruction(Instruction instruction) {
         // Determine the type of instruction and handle accordingly
-        if (instruction.getInstructionType().equals("Load") || instruction.getInstructionType().equals("Store")) {
+        if (instruction.getInstructionType().equalsIgnoreCase("Load") || instruction.getInstructionType().equalsIgnoreCase("Store")) {
             issueLoadStoreInstruction(instruction);
-        } else if (instruction.getInstructionType().equals("Add") || instruction.getInstructionType().equals("Sub")) {
+        } else if (instruction.getInstructionType().equalsIgnoreCase("Add") || instruction.getInstructionType().equalsIgnoreCase("Sub")) {
             issueAddSubInstruction(instruction);
-        } else if (instruction.getInstructionType().equals("Mul") || instruction.getInstructionType().equals("Div")) {
+        } else if (instruction.getInstructionType().equalsIgnoreCase("Mult") || instruction.getInstructionType().equalsIgnoreCase("Div")) {
             issueMulDivInstruction(instruction);
         } else {
             System.out.println("Unsupported instruction type: " + instruction.getInstructionType());
@@ -156,9 +162,7 @@ public class Tomasulo {
             // Issue the instruction to the load or store buffer
             loadStoreBuffer.issueInstruction(instruction);
 
-            // Other logic for handling the issue process
-
-            // Increment the appropriate total cycle count based on the type of instruction
+            
             incrementTotalCycles(instruction);
 
             System.out.println("Load/Store Instruction issued: " + instruction.toString());
@@ -171,16 +175,12 @@ public class Tomasulo {
         // Get the available add/sub reservation station
         ReservationStation addSubReservationStation = getAvailableAddSubReservationStation();
 
-        if (addSubReservationStation != null && !addSubReservationStation.isOccupied()) {
-            // Set the issue cycle in the instruction status
+        if (addSubReservationStation != null) {
             instruction.getInstructionStatus().setIssue(getCurrentCycle());
 
-            // Issue the instruction to the add/sub reservation station
             addSubReservationStation.issueInstruction(instruction);
 
-            // Other logic for handling the issue process
 
-            // Increment the appropriate total cycle count based on the type of instruction
             incrementTotalCycles(instruction);
 
             System.out.println("Add/Sub Instruction issued: " + instruction.toString());
@@ -231,9 +231,7 @@ public class Tomasulo {
     }
     
     public void printInstructions() {
-        for (int i = 0; i < totalInstructions; i++) {
-            System.out.println(instructions[i].toString());
-        }
+            System.out.println(Icache);
     }
     
     private int getCurrentCycle() {

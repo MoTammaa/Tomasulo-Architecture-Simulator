@@ -6,7 +6,7 @@ public class Instruction {
     private String Rd;
     private String Rt;
     private String immediateOffset;
-    private InstructionStatus instructionStatus;
+    private InstructionStatus instructionStatus = new InstructionStatus();
     
     public String getInstructionType() {
         return instructionType;

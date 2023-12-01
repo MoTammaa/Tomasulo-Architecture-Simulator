@@ -29,19 +29,9 @@ public class InstructionCache extends Cache{
             System.err.println("Instruction Cache is full");
         }
     }
-    public String executeInstruction() {
-        if (PC <= lastInstruction) {
-            return instructions[PC++].execute();
-        } else {
-            return "No more instructions to execute";
-        }
-    }
     public boolean issueInstruction() {
         if (PC <= lastInstruction) {
             PC++;
-            // TODO: whatever you want to do here
-
-
             return true;
         } else {
             return false;
