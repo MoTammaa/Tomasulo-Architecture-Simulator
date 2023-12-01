@@ -8,7 +8,14 @@ public class LoadStoreBuffer {
     private String address;
     private String fu;
     private Instruction instruction;
-    
+
+    public LoadStoreBuffer(String bufferName) {
+        this.bufferName = bufferName;
+    }
+
+    public String getName() {
+        return bufferName;
+    }
     public void issueInstruction(Instruction instruction) {
         this.instruction = instruction;
         this.isOccupied=true;

@@ -12,6 +12,10 @@ public class ReservationStation {
     private String Qk;
     private Instruction instruction;
 
+    public ReservationStation(String reservationStationName) {
+        this.reservationStationName = reservationStationName;
+    }
+
     public void issueInstruction(Instruction instruction) {
         this.instruction = instruction;
         this.isOccupied=true;
