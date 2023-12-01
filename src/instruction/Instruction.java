@@ -4,18 +4,59 @@ public class Instruction {
     private String instructionType;
     private String Rs;
     private String Rd;
-    private int Rt;
-    private int immediateOffset;
-    private InstructionStatus instructionStatus;
+    private String Rt;
+    private String immediateOffset;
+    private InstructionStatus instructionStatus = new InstructionStatus();
+    
+    public String getInstructionType() {
+        return instructionType;
+    }
 
-    public Instruction(String instructionType) {
+    public void setInstructionType(String instructionType) {
         this.instructionType = instructionType;
     }
-    public String execute() {
-        return "Executed";
+
+    public String getRs() {
+        return Rs;
     }
-    @Override
+
+    public void setRs(String rs) {
+        Rs = rs;
+    }
+
+    public String getRd() {
+        return Rd;
+    }
+
+    public void setRd(String rd) {
+        Rd = rd;
+    }
+
+    public String getRt() {
+        return Rt;
+    }
+
+    public void setRt(String rt) {
+        Rt = rt;
+    }
+
+    public String getImmediateOffset() {
+        return immediateOffset;
+    }
+
+    public void setImmediateOffset(String immediateOffset) {
+        this.immediateOffset = immediateOffset;
+    }
+
+    public InstructionStatus getInstructionStatus() {
+        return instructionStatus;
+    }
+
+    public void setInstructionStatus(InstructionStatus instructionStatus) {
+        this.instructionStatus = instructionStatus;
+    }
+
     public String toString() {
-        return "'" + instructionType + " " + Rs + " ," + Rd + " ," + Rt + " " + immediateOffset + "'" /*+ " " + instructionStatus*/;
+        return "Type: " + instructionType + " Rs: " + Rs + " Rd: " + Rd + " Rt: " + Rt + " Immediate: " + immediateOffset;
     }
 }

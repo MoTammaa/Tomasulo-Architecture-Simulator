@@ -4,8 +4,25 @@ import instruction.Instruction;
 
 public class LoadStoreBuffer {
     private String bufferName;
-    private boolean isBusy;
+    private boolean isOccupied=false;
     private String address;
     private String fu;
-    private Instruction instructionPointer;
+    private Instruction instruction;
+    
+    public void issueInstruction(Instruction instruction) {
+        this.instruction = instruction;
+        this.isOccupied=true;
+    }
+
+    public boolean isOccupied() {
+        return isOccupied;
+    }
+
+    public void occupy() {
+        isOccupied = true;
+    }
+
+    public void release() {
+        isOccupied = false;
+    }
 }
