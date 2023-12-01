@@ -28,4 +28,17 @@ public class ReservationStation {
     public void release() {
         this.isOccupied = false;
     }
+    @Override
+    public String toString() {
+        return "ReservationStation{" +
+                "reservationStationName='" + reservationStationName + '\'' +
+                ", isOccupied=" + isOccupied +
+                ", instructionType='" + instructionType + '\'' +
+                ", Vj='" + Vj + '\'' +
+                ", Vk='" + Vk + '\'' +
+                ", Qj='" + Qj + '\'' +
+                ", Qk='" + Qk + '\'' +
+                ", instruction=" + instruction +
+                '}';
+    }
 }

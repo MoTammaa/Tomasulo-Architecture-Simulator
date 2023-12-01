@@ -13,7 +13,7 @@ import reservationStations.*;
 public class Tomasulo {
     private static final int MAX_LOAD_BUFFERS = 10;
     private static final int MAX_STORE_BUFFERS = 10;
-    private static final int MAX_ADD_STATIONS = 10;
+    private static final int MAX_ADD_STATIONS = 2;
     private static final int MAX_MUL_DIV_STATIONS = 10;
     private static final int MAX_REGISTERS = 32;
     private static final int MAX_INSTRUCTIONS = 100;
@@ -43,14 +43,22 @@ public class Tomasulo {
     private static final int DEFAULT_CYCLES = 2;
 
     public Tomasulo() {
-        this.loadBuffers = new LoadStoreBuffer[MAX_LOAD_BUFFERS];
-        Arrays.fill(loadBuffers, new LoadStoreBuffer());
+        this.loadBuffers = new LoadStoreBuffer[MAX_LOAD_BUFFERS];  
+        for (int i = 0; i < loadBuffers.length; i++) {
+            loadBuffers[i]= new LoadStoreBuffer();
+        }
         this.storeBuffers = new LoadStoreBuffer[MAX_STORE_BUFFERS];
-        Arrays.fill(storeBuffers, new LoadStoreBuffer());
+        for(int i = 0; i < storeBuffers.length; i++) {
+            storeBuffers[i]= new LoadStoreBuffer();
+        }
         this.addSubReservationStations = new ReservationStation[MAX_ADD_STATIONS];
-        Arrays.fill(addSubReservationStations, new ReservationStation());
+        for(int i = 0; i < addSubReservationStations.length; i++) {
+            addSubReservationStations[i]= new ReservationStation();
+        }
         this.mulDivReservationStations = new ReservationStation[MAX_MUL_DIV_STATIONS];
-        Arrays.fill(mulDivReservationStations, new ReservationStation());
+        for(int i = 0; i < mulDivReservationStations.length; i++) {
+            mulDivReservationStations[i]= new ReservationStation();
+        }
         this.registerFile = new RegisterFile(); 
         this.instructions = new Instruction[MAX_INSTRUCTIONS];
         
@@ -74,9 +82,9 @@ public class Tomasulo {
                     instructionIndex++;
                     Icache.addInstruction(instruction);
                     issueInstruction(instruction);
-                    System.out.println(getCurrentCycle());
                 }
             }
+            System.out.println(".......\n"+Arrays.toString(addSubReservationStations));
             totalInstructions = instructionIndex;
         } catch (IOException e) {
             System.err.println("Error reading from file: " + e.getMessage());
@@ -86,7 +94,7 @@ public class Tomasulo {
 
     private ReservationStation getFirstAvailableReservationStation(ReservationStation[] stations) {
         for (ReservationStation station : stations) {
-            if (station != null && !station.isOccupied()) {
+            if (!station.isOccupied()) {
                 return station;
             }
         }
@@ -95,7 +103,7 @@ public class Tomasulo {
 
     private LoadStoreBuffer getFirstAvailableLoadBuffer() {
         for (LoadStoreBuffer loadBuffer : loadBuffers) {
-            if (loadBuffer != null && !loadBuffer.isOccupied()) {
+            if (!loadBuffer.isOccupied()) {
                 return loadBuffer;
             }
         }
@@ -104,7 +112,7 @@ public class Tomasulo {
 
     private LoadStoreBuffer getFirstAvailableStoreBuffer() {
         for (LoadStoreBuffer storeBuffer : storeBuffers) {
-            if (storeBuffer != null && !storeBuffer.isOccupied()) {
+            if (!storeBuffer.isOccupied()) {
                 return storeBuffer;
             }
         }
@@ -161,6 +169,7 @@ public class Tomasulo {
 
             // Issue the instruction to the load or store buffer
             loadStoreBuffer.issueInstruction(instruction);
+            
 
             
             incrementTotalCycles(instruction);
@@ -179,6 +188,10 @@ public class Tomasulo {
             instruction.getInstructionStatus().setIssue(getCurrentCycle());
 
             addSubReservationStation.issueInstruction(instruction);
+            
+            
+            System.out.println(addSubReservationStation);
+            
 
 
             incrementTotalCycles(instruction);
