@@ -61,20 +61,17 @@ public class Tomasulo {
         }
         this.registerFile = new RegisterFile(); 
         this.instructions = new Instruction[MAX_INSTRUCTIONS];
-        
-
         this.totalLoadStoreCycles = DEFAULT_CYCLES;
         this.totalAddSubCycles = DEFAULT_CYCLES;
         this.totalMulCycles = DEFAULT_CYCLES;
         this.totalDivCycles = DEFAULT_CYCLES;
         this.Icache = new InstructionCache(10);
     }
-    
+        
         public void loadDataFromFile(String filePath) {
         try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
             String line;
             int instructionIndex = 0;
-
             while ((line = reader.readLine()) != null) {
                 Instruction instruction = parseInstruction(line);
                 if (instruction != null) {
@@ -91,7 +88,6 @@ public class Tomasulo {
             e.printStackTrace();
         }
     }
-
     private ReservationStation getFirstAvailableReservationStation(ReservationStation[] stations) {
         for (ReservationStation station : stations) {
             if (!station.isOccupied()) {
@@ -100,7 +96,6 @@ public class Tomasulo {
         }
         return null;
     }
-
     private LoadStoreBuffer getFirstAvailableLoadBuffer() {
         for (LoadStoreBuffer loadBuffer : loadBuffers) {
             if (!loadBuffer.isOccupied()) {
@@ -109,7 +104,6 @@ public class Tomasulo {
         }
         return null;
     }
-
     private LoadStoreBuffer getFirstAvailableStoreBuffer() {
         for (LoadStoreBuffer storeBuffer : storeBuffers) {
             if (!storeBuffer.isOccupied()) {
@@ -118,15 +112,12 @@ public class Tomasulo {
         }
         return null;
     }
-
     private LoadStoreBuffer getAvailableLoadBuffer() {
         return getFirstAvailableLoadBuffer();
     }
-
     private LoadStoreBuffer getAvailableStoreBuffer() {
         return getFirstAvailableStoreBuffer();
     }
-
     private LoadStoreBuffer getAvailableLoadStoreBuffer(Instruction instruction) {
         if (instruction.getInstructionType().equalsIgnoreCase("Load")) {
             return getAvailableLoadBuffer();
@@ -137,20 +128,17 @@ public class Tomasulo {
         System.out.println("Unsupported instruction type: " + instruction.getInstructionType());
         return null;
     }
-
     private ReservationStation getAvailableAddSubReservationStation() {
         return getFirstAvailableReservationStation(addSubReservationStations);
     }
-
     private ReservationStation getAvailableMulDivReservationStation() {
         return getFirstAvailableReservationStation(mulDivReservationStations);
     }
-    
     public void issueInstruction(Instruction instruction) {
         // Determine the type of instruction and handle accordingly
         if (instruction.getInstructionType().equalsIgnoreCase("Load") || instruction.getInstructionType().equalsIgnoreCase("Store")) {
             issueLoadStoreInstruction(instruction);
-        } else if (instruction.getInstructionType().equalsIgnoreCase("Add") || instruction.getInstructionType().equalsIgnoreCase("Sub")|| instruction.getInstructionType().equalsIgnoreCase("SUBI")|| instruction.getInstructionType().equalsIgnoreCase("ADDI")) {
+        } else if (instruction.getInstructionType().equalsIgnoreCase("Add") || instruction.getInstructionType().equalsIgnoreCase("Sub")|| instruction.getInstructionType().equalsIgnoreCase("SUBI")|| instruction.getInstructionType().equalsIgnoreCase("ADDI")||instruction.getInstructionType().equalsIgnoreCase("bnez")) {
             issueAddSubInstruction(instruction);
         } else if (instruction.getInstructionType().equalsIgnoreCase("Mult") || instruction.getInstructionType().equalsIgnoreCase("Div")) {
             issueMulDivInstruction(instruction);
@@ -158,75 +146,50 @@ public class Tomasulo {
             System.out.println("Unsupported instruction type: " + instruction.getInstructionType());
         }
     }
-
     private void issueLoadStoreInstruction(Instruction instruction) {
         // Get the available load or store buffer
         LoadStoreBuffer loadStoreBuffer = getAvailableLoadStoreBuffer(instruction);
-
         if (loadStoreBuffer != null && !loadStoreBuffer.isOccupied()) {
             // Set the issue cycle in the instruction status
             instruction.getInstructionStatus().setIssue(getCurrentCycle());
 
             // Issue the instruction to the load or store buffer
             loadStoreBuffer.issueInstruction(instruction);
-            
-
-            
             incrementTotalCycles(instruction);
-
             System.out.println("Load/Store Instruction issued: " + instruction.toString());
         } else {
             System.out.println("Load/Store buffer is occupied. Cannot issue instruction.");
         }
     }
-
     private void issueAddSubInstruction(Instruction instruction) {
         // Get the available add/sub reservation station
         ReservationStation addSubReservationStation = getAvailableAddSubReservationStation();
-
         if (addSubReservationStation != null) {
             instruction.getInstructionStatus().setIssue(getCurrentCycle());
-
             addSubReservationStation.issueInstruction(instruction);
-            
-            
             System.out.println(addSubReservationStation);
-            
-
-
             incrementTotalCycles(instruction);
-
             System.out.println("Add/Sub Instruction issued: " + instruction.toString());
         } else {
             System.out.println("Add/Sub reservation station is occupied. Cannot issue instruction.");
         }
     }
-
 	private void issueMulDivInstruction(Instruction instruction) {
         // Get the available multiply/divide reservation station
         ReservationStation mulDivReservationStation = getAvailableMulDivReservationStation();
-
         if (mulDivReservationStation != null && !mulDivReservationStation.isOccupied()) {
             // Set the issue cycle in the instruction status
             instruction.getInstructionStatus().setIssue(getCurrentCycle());
-
             // Issue the instruction to the multiply/divide reservation station
             mulDivReservationStation.issueInstruction(instruction);
-
             // Other logic for handling the issue process
-
             // Increment the appropriate total cycle count based on the type of instruction
             incrementTotalCycles(instruction);
-
             System.out.println("Mul/Div Instruction issued: " + instruction.toString());
         } else {
             System.out.println("Mul/Div reservation station is occupied. Cannot issue instruction.");
         }
     }
-
-    // Rest of the methods remain the same
-
-
     public void executeInstructions() {
         // Implementation for executing instructions
     }
@@ -317,7 +280,4 @@ public class Tomasulo {
             return null;
         }
     }
-
-
-
 }
