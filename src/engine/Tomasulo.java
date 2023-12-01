@@ -1,13 +1,12 @@
 package engine;
 
-import instruction.Instruction;
-import registerFile.RegisterStatus;
-import reservationStations.LoadStoreBuffer;
-import reservationStations.ReservationStation;
-
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import caches.*;
+import instruction.*;
+import registerFile.*;
+import reservationStations.*;
 
 public class Tomasulo {
     private static final int MAX_LOAD_BUFFERS = 10;
@@ -27,8 +26,7 @@ public class Tomasulo {
     private int totalAddReservationStations;
 
     private ReservationStation[] mulDivReservationStations;
-
-    private RegisterStatus[] registerStatus;
+    private RegisterFile registerFile;
     private int totalRegisters;
 
     private Instruction[] instructions;
