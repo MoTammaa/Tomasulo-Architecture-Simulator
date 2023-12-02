@@ -76,7 +76,26 @@ public class Tomasulo {
         this.totalDivCycles = DEFAULT_CYCLES;
         this.Icache = new InstructionCache(10);
     }
-        
+
+    // getters
+    public static LoadStoreBuffer[] getLoadBuffers() {
+        return loadBuffers;
+    }
+    public static LoadStoreBuffer[] getStoreBuffers() {
+        return storeBuffers;
+    }
+    public static ReservationStation[] getAddSubReservationStations() {
+        return addSubReservationStations;
+    }
+    public static ReservationStation[] getMulDivReservationStations() {
+        return mulDivReservationStations;
+    }
+    public static RegisterFile getRegisterFile() {
+        return registerFile;
+    }
+
+
+
         public static void loadDataFromFile(String filePath) {
         try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
             String line;
@@ -127,9 +146,9 @@ public class Tomasulo {
         return getFirstAvailableStoreBuffer();
     }
     private static LoadStoreBuffer getAvailableLoadStoreBuffer(Instruction instruction) {
-        if (instruction.getInstructionType().equalsIgnoreCase("Load")) {
+        if (instruction.getInstructionType() == ITypes.LOAD ) {
             return getAvailableLoadBuffer();
-        } else if (instruction.getInstructionType().equalsIgnoreCase("Store")) {
+        } else if (instruction.getInstructionType() == ITypes.STORE) {
             return getAvailableStoreBuffer();
         }
 
@@ -144,11 +163,16 @@ public class Tomasulo {
     }
     public static boolean issueInstruction(Instruction instruction) {
         // Determine the type of instruction and handle accordingly
-        if (instruction.getInstructionType().equalsIgnoreCase("Load") || instruction.getInstructionType().equalsIgnoreCase("Store")) {
+        if (instruction.getInstructionType() == ITypes.LOAD || instruction.getInstructionType() == ITypes.STORE) {
             return issueLoadStoreInstruction(instruction);
-        } else if (instruction.getInstructionType().equalsIgnoreCase("Add") || instruction.getInstructionType().equalsIgnoreCase("Sub")|| instruction.getInstructionType().equalsIgnoreCase("SUBI")|| instruction.getInstructionType().equalsIgnoreCase("ADDI")||instruction.getInstructionType().equalsIgnoreCase("bnez")) {
+        } else if (instruction.getInstructionType() == ITypes.ADD ||
+                    instruction.getInstructionType() == ITypes.SUB ||
+                    instruction.getInstructionType() == ITypes.SUBI ||
+                    instruction.getInstructionType() == ITypes.ADDI ||
+                    instruction.getInstructionType() == ITypes.BNEZ) {
             return issueAddSubInstruction(instruction);
-        } else if (instruction.getInstructionType().equalsIgnoreCase("Mult") || instruction.getInstructionType().equalsIgnoreCase("Div")) {
+        } else if (instruction.getInstructionType() == ITypes.MUL ||
+                instruction.getInstructionType() == ITypes.DIV) {
             return issueMulDivInstruction(instruction);
         } else {
             System.out.println("Unsupported instruction type: " + instruction.getInstructionType());
@@ -207,6 +231,7 @@ public class Tomasulo {
     }
     public static void executeInstructions() {
         // Implementation for executing instructions
+        //TODO: When issuing an instruction, set the value of the Qj and Qk fields in the reservation station (and others...)
         startExecutionInStation(addSubReservationStations);
 
         startExecutionInStation(mulDivReservationStations);
@@ -306,16 +331,16 @@ public class Tomasulo {
     private static void incrementTotalCycles(Instruction instruction) {
         // Increment the appropriate total cycle count based on the type of instruction
         switch (instruction.getInstructionType()) {
-            case "Load":
-            case "Store":
+            case LOAD:
+            case STORE:
                 totalLoadStoreCycles++;
                 break;
-            case "Add":
-            case "Sub":
+            case ADD:
+            case SUB:
                 totalAddSubCycles++;
                 break;
-            case "Mul":
-            case "Div":
+            case MUL:
+            case DIV:
                 totalMulCycles++;
                 break;
         }

@@ -3,7 +3,7 @@ package instruction;
 import engine.Tomasulo;
 
 public class Instruction {
-    private String instructionType;
+    private ITypes instructionType;
     private String Rs;
     private String Rd;
     private String Rt;
@@ -17,28 +17,28 @@ public class Instruction {
         int totalCycles = 0;
 
         switch (instructionType) {
-            case "ADD":
+            case ADD:
                 totalCycles = Tomasulo.ADD_CYCLES;
                 break;
-case "SUB":
+            case SUB:
                 totalCycles = Tomasulo.SUB_CYCLES;
                 break;
-            case "MULT":
-            case "MULTI":
+            case MUL:
+            case MULI:
                 totalCycles = Tomasulo.MUL_CYCLES;
                 break;
-            case "DIV":
-            case "DIVI":
+            case DIV:
+            case DIVI:
                 totalCycles = Tomasulo.DIV_CYCLES;
                 break;
-            case "ADDI":
-            case "SUBI":
+            case ADDI:
+            case SUBI:
                 totalCycles = Tomasulo.ADDI_CYCLES;
                 break;
-            case "LOAD":
+            case LOAD:
                 totalCycles = Tomasulo.LOAD_CYCLES;
                 break;
-            case "STORE":
+            case STORE:
                 totalCycles = Tomasulo.STORE_CYCLES;
                 break;
             default:
@@ -48,11 +48,11 @@ case "SUB":
     	this.instructionStatus.setExecutionStart(currentCycle);
         this.instructionStatus.setExecutionComplete(currentCycle+totalCycles-1);
     }
-    public String getInstructionType() {
+    public ITypes getInstructionType() {
         return instructionType;
     }
 
-    public void setInstructionType(String instructionType) {
+    public void setInstructionType(ITypes instructionType) {
         this.instructionType = instructionType;
     }
 
@@ -122,7 +122,7 @@ case "SUB":
             }
 
             Instruction instruction = new Instruction();
-            instruction.setInstructionType(opcode);
+            instruction.setInstructionType(ITypes.getInstructionType(opcode));
             instruction.setRs(src1);
             instruction.setRd(dest);
             instruction.setRt(src2);
@@ -136,6 +136,6 @@ case "SUB":
     }
 
     public String toString() {
-        return instructionType + " (Rd:" + Rd + "), (Rs:" + Rs + "),"+ (!instructionType.endsWith("i")&&!instructionType.endsWith("I") ? "  (Rt:" + Rt + ")" :" imm: " + immediateOffset);
+        return instructionType + " (Rd:" + Rd + "), (Rs:" + Rs + "),"+ (!instructionType.toString().endsWith("i")&&!instructionType.toString().endsWith("I") ? "  (Rt:" + Rt + ")" :" imm: " + immediateOffset);
     }
 }

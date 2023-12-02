@@ -93,4 +93,12 @@ public class RegisterFile {
             return floatingRegs[Integer.parseInt(rs.substring(1))].isReady();
         }
     }
+
+    public String getQ(String rs) {
+        if (rs.charAt(0) == 'R') {
+            return integerRegs[Integer.parseInt(rs.substring(1))].getRegisterStatus();
+        } else {
+            return floatingRegs[Integer.parseInt(rs.substring(1))].getRegisterStatus();
+        }
+    }
 }

@@ -1,11 +1,13 @@
 package reservationStations;
 
+import engine.Tomasulo;
+import instruction.ITypes;
 import instruction.Instruction;
 
 public class ReservationStation {
     private final String reservationStationName;
     private boolean isOccupied=false;
-    private String instructionType;
+    private ITypes instructionType;
     private String Vj;
     private String Vk;
     private String Qj;
@@ -20,9 +22,24 @@ public class ReservationStation {
         this.instruction = instruction;
         this.instructionType = instruction.getInstructionType();
         this.isOccupied=true;
+
+//        if (instructionType.toString().endsWith("I")) { // if instruction is immediate
+//            this.Qj = Tomasulo.getRegisterFile().getQ(instruction.getRs());
+//            if (this.Qj.equals("0"))
+//                this.Vj = Tomasulo.getRegisterFile().M(instruction.getRs());
+//            else
+//                this.Vj = instruction.getRs();
+//            this.Vk = instruction.getImmediateOffset();
+//        } else {
+//            this.Vj = Tomasulo.getRegisterFile().get(instruction.getRs());
+//            this.Vk = Tomasulo.getRegisterFile().get(instruction.getRt());
+//        }
+//
+//        this.Qj = Tomasulo.getRegisterFile().getQ(instruction.getRs());
+//        this.Qk = Tomasulo.getRegisterFile().getQ(instruction.getRt());
     }
 
-    public void setInstructionType(String instructionType) {
+    public void setInstructionType(ITypes instructionType) {
         this.instructionType = instructionType;
     }
 
@@ -46,7 +63,7 @@ public class ReservationStation {
         return reservationStationName;
     }
 
-    public String getInstructionType() {
+    public ITypes getInstructionType() {
         return instructionType;
     }
 
