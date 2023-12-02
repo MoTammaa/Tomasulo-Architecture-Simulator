@@ -35,8 +35,7 @@ public class Instruction {
             case DIVI:
                 totalCycles = Tomasulo.DIV_CYCLES;
                 break;
-            case ADDI:
-            case SUBI:
+            case ADDI, SUBI:
                 totalCycles = Tomasulo.ADDI_CYCLES;
                 break;
             case LOAD, L_D:
@@ -107,20 +106,48 @@ public class Instruction {
         	String result;
         	switch (instructionType) {
             case ADD, ADDI:
-                result = ( Rs.startsWith("R") ? Long.parseLong(((ReservationStation)station).getVj()) : Double.parseDouble(((ReservationStation)station).getVj()))
-                            + ( Rt.startsWith("R") || instructionType.toString().endsWith("I") ? Long.parseLong(((ReservationStation)station).getVk()) : Double.parseDouble(((ReservationStation)station).getVk())) + "";
+//                result = ( Rs.startsWith("R") ? Long.parseLong(((ReservationStation)station).getVj()) : Double.parseDouble(((ReservationStation)station).getVj()))
+//                            + ( Rt.startsWith("R") || instructionType.toString().endsWith("I") ? Long.parseLong(((ReservationStation)station).getVk()) : Double.parseDouble(((ReservationStation)station).getVk()));
+                if (instructionType.toString().endsWith("I")) {
+                    result = Long.toString(Long.parseLong(((ReservationStation)station).getVj()) + Long.parseLong(((ReservationStation)station).getVk()));
+                } else {
+                    result = Rs.startsWith("R") ? Long.toString(Long.parseLong(((ReservationStation)station).getVj()) + Long.parseLong(((ReservationStation)station).getVk())) :
+                            Double.toString(Double.parseDouble(((ReservationStation)station).getVj()) + Double.parseDouble(((ReservationStation)station).getVk()));
+                }
                 break;
             case SUB, SUBI:
-                result = ( Rs.startsWith("R") ? Long.parseLong(((ReservationStation)station).getVj()) : Double.parseDouble(((ReservationStation)station).getVj()))
-                            - ( Rt.startsWith("R") || instructionType.toString().endsWith("I") ? Long.parseLong(((ReservationStation)station).getVk()) : Double.parseDouble(((ReservationStation)station).getVk())) + "";
+//                result = ( Rs.startsWith("R") ? Long.parseLong(((ReservationStation)station).getVj()) : Double.parseDouble(((ReservationStation)station).getVj()))
+//                            - ( Rt.startsWith("R") || instructionType.toString().endsWith("I") ? Long.parseLong(((ReservationStation)station).getVk()) : Double.parseDouble(((ReservationStation)station).getVk())) + "";
+                if (instructionType.toString().endsWith("I")) {
+                    result = Long.toString(Long.parseLong(((ReservationStation)station).getVj()) - Long.parseLong(((ReservationStation)station).getVk()));
+                } else {
+                    result = Rs.startsWith("R") ? Long.toString(Long.parseLong(((ReservationStation)station).getVj()) - Long.parseLong(((ReservationStation)station).getVk())) :
+                            Double.toString(Double.parseDouble(((ReservationStation)station).getVj()) - Double.parseDouble(((ReservationStation)station).getVk()));
+                }
                 break;
             case MUL, MULI:
-                result = ( Rs.startsWith("R") ? Long.parseLong(((ReservationStation)station).getVj()) : Double.parseDouble(((ReservationStation)station).getVj()))
-                            * ( Rt.startsWith("R") || instructionType.toString().endsWith("I") ? Long.parseLong(((ReservationStation)station).getVk()) : Double.parseDouble(((ReservationStation)station).getVk())) + "";
+//                result = ( Rs.startsWith("R") ? Long.parseLong(((ReservationStation)station).getVj()) : Double.parseDouble(((ReservationStation)station).getVj()))
+//                            * ( Rt.startsWith("R") || instructionType.toString().endsWith("I") ? Long.parseLong(((ReservationStation)station).getVk()) : Double.parseDouble(((ReservationStation)station).getVk())) + "";
+                if (instructionType.toString().endsWith("I")) {
+                    result = Long.toString(Long.parseLong(((ReservationStation)station).getVj()) * Long.parseLong(((ReservationStation)station).getVk()));
+                } else {
+                    result = Rs.startsWith("R") ? Long.toString(Long.parseLong(((ReservationStation)station).getVj()) * Long.parseLong(((ReservationStation)station).getVk())) :
+                            Double.toString(Double.parseDouble(((ReservationStation)station).getVj()) * Double.parseDouble(((ReservationStation)station).getVk()));
+                }
                 break;
             case DIV, DIVI:
-                result = ( Rs.startsWith("R") ? Long.parseLong(((ReservationStation)station).getVj()) : Double.parseDouble(((ReservationStation)station).getVj()))
-                            / ( Rt.startsWith("R") || instructionType.toString().endsWith("I") ? Long.parseLong(((ReservationStation)station).getVk()) : Double.parseDouble(((ReservationStation)station).getVk())) + "";
+//                result = ( Rs.startsWith("R") ? Long.parseLong(((ReservationStation)station).getVj()) : Double.parseDouble(((ReservationStation)station).getVj()))
+//                            / ( Rt.startsWith("R") || instructionType.toString().endsWith("I") ? Long.parseLong(((ReservationStation)station).getVk()) : Double.parseDouble(((ReservationStation)station).getVk())) + "";
+                if (((ReservationStation)station).getVk().equals("0") || ((ReservationStation)station).getVk().equals("0.0")){
+                    System.err.println("YOU CANNOT DIVIDE BY ZERO!! matet3ebneesh m3ak ya 7abibi");
+                    ((ReservationStation)station).setVk("1");
+                }
+                if (instructionType.toString().endsWith("I")) {
+                    result = Long.toString(Long.parseLong(((ReservationStation)station).getVj()) / Long.parseLong(((ReservationStation)station).getVk()));
+                } else {
+                    result = Rs.startsWith("R") ? Long.toString(Long.parseLong(((ReservationStation)station).getVj()) / Long.parseLong(((ReservationStation)station).getVk())) :
+                            Double.toString(Double.parseDouble(((ReservationStation)station).getVj()) / Double.parseDouble(((ReservationStation)station).getVk()));
+                }
                 break;
             case LOAD, L_D:
                 result = Rs;

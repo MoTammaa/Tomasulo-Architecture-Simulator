@@ -12,20 +12,26 @@ import reservationStations.*;
 
 public class Tomasulo {
 
-    public static final int LOAD_CYCLES = 1;
+    public static final int LOAD_CYCLES = 2;
     public static final int STORE_CYCLES = 2;
     public static final int ADD_CYCLES = 2;
     public static final int SUB_CYCLES = 2;
     public static final int MUL_CYCLES = 5;
-    public static final int DIV_CYCLES = 10;
+    public static final int DIV_CYCLES = 6;
     public static final int BNEZ_CYCLES = 1;
     public static final int ADDI_CYCLES = 1;
-    private static final int MAX_LOAD_BUFFERS = 10;
-    private static final int MAX_STORE_BUFFERS = 10;
-    private static final int MAX_ADD_STATIONS = 3;
-    private static final int MAX_MUL_DIV_STATIONS = 10;
+
+
+
+    private static final int MAX_LOAD_BUFFERS = 2;
+    private static final int MAX_STORE_BUFFERS = 2;
+    private static final int MAX_ADD_STATIONS = 2;
+    private static final int MAX_MUL_DIV_STATIONS = 2;
+
+
     private static final int MAX_REGISTERS = 32;
     private static final int MAX_INSTRUCTIONS = 100;
+
     private static InstructionCache Icache;
     private static DataCache Dcache;
     
@@ -197,7 +203,6 @@ public class Tomasulo {
 
             // Issue the instruction to the load or store buffer
             loadStoreBuffer.issueInstruction(instruction);
-            incrementTotalCycles(instruction);
             //System.out.println("Load/Store Instruction issued: " + instruction.toString());
         } else {
             System.out.println("Load/Store buffer is occupied. Cannot issue instruction.");
@@ -212,7 +217,6 @@ public class Tomasulo {
             instruction.getInstructionStatus().setIssue(getCurrentCycle());
             addSubReservationStation.issueInstruction(instruction);
 //            System.out.println(addSubReservationStation);
-            incrementTotalCycles(instruction);
 //            System.out.println("Add/Sub Instruction issued: " + instruction.toString());
         } else {
             System.out.println("Add/Sub reservation station is occupied. Cannot issue instruction.");
@@ -229,8 +233,6 @@ public class Tomasulo {
             // Issue the instruction to the multiply/divide reservation station
             mulDivReservationStation.issueInstruction(instruction);
             // Other logic for handling the issue process
-            // Increment the appropriate total cycle count based on the type of instruction
-            incrementTotalCycles(instruction);
 //            System.out.println("Mul/Div Instruction issued: " + instruction.toString());
         } else {
             System.out.println("Mul/Div reservation station is occupied. Cannot issue instruction.");
@@ -256,9 +258,10 @@ public class Tomasulo {
         for (ReservationStation station : addSubReservationStations) {
             if (station.isOccupied()) {
                 Instruction instruction = station.getInstruction();
-                if (instruction.getInstructionStatus().getIssue() != null && instruction.getInstructionStatus().getExecutionStart() == null) {
+                if (instruction.getInstructionStatus().getIssue() != null && instruction.getInstructionStatus().getExecutionStart() == null ) {
                     // check if the operands are ready
-                    if (station.isReady()) {
+                    if (station.isReady() && instruction.getInstructionStatus().getIssue() != null && instruction.getInstructionStatus().getExecutionStart() == null
+                            && instruction.getInstructionStatus().getIssue() <= getCurrentCycle() - 1) {
                         instruction.startExecution(getCurrentCycle());
                         System.out.println("Instruction " + instruction.toString() + " started execution at cycle " + getCurrentCycle());
                     }
@@ -272,7 +275,8 @@ public class Tomasulo {
         for (LoadStoreBuffer lsBuffer : buffers) {
             if (lsBuffer.isOccupied()) {
                 Instruction instruction = lsBuffer.getInstruction();
-                if (instruction.getInstructionStatus().getIssue() != null && instruction.getInstructionStatus().getExecutionStart() == null) {
+                if (instruction.getInstructionStatus().getIssue() != null && instruction.getInstructionStatus().getExecutionStart() == null
+                        && instruction.getInstructionStatus().getIssue() <= getCurrentCycle() - 1)  {
                     instruction.startExecution(getCurrentCycle());
                     System.out.println("Instruction " + instruction.toString() + " started execution at cycle " + getCurrentCycle());
                 }
@@ -286,10 +290,12 @@ public class Tomasulo {
         for (ReservationStation station : addSubReservationStations) {
             if (station.isOccupied()) {
                 Instruction instruction = station.getInstruction();
-                if (instruction.getInstructionStatus().getExecutionComplete() != null && instruction.getInstructionStatus().getWriteBack() == null) {
+                if (instruction.getInstructionStatus().getExecutionComplete() != null && instruction.getInstructionStatus().getWriteBack() == null
+                        && instruction.getInstructionStatus().getExecutionComplete() <= getCurrentCycle()-1) {
                     // Write back the result to the register file
                     station.writeBack();
                     System.out.println("Instruction " + instruction.toString() + " wrote back result at cycle " + getCurrentCycle());
+                    station.release();
                 }
             }
         }
@@ -297,10 +303,12 @@ public class Tomasulo {
         for (ReservationStation station : mulDivReservationStations) {
             if (station.isOccupied()) {
                 Instruction instruction = station.getInstruction();
-                if (instruction.getInstructionStatus().getExecutionComplete() != null && instruction.getInstructionStatus().getWriteBack() == null) {
+                if (instruction.getInstructionStatus().getExecutionComplete() != null && instruction.getInstructionStatus().getWriteBack() == null
+                        && instruction.getInstructionStatus().getExecutionComplete() <= getCurrentCycle()-1) {
                     // Write back the result to the register file
                     station.writeBack();
                     System.out.println("Instruction " + instruction.toString() + " wrote back result at cycle " + getCurrentCycle());
+                    station.release();
                 }
             }
         }
@@ -308,10 +316,12 @@ public class Tomasulo {
         for (LoadStoreBuffer loadBuffer : loadBuffers) {
             if (loadBuffer.isOccupied()) {
                 Instruction instruction = loadBuffer.getInstruction();
-                if (instruction.getInstructionStatus().getExecutionComplete() != null && instruction.getInstructionStatus().getWriteBack() == null) {
+                if (instruction.getInstructionStatus().getExecutionComplete() != null && instruction.getInstructionStatus().getWriteBack() == null
+                        && instruction.getInstructionStatus().getExecutionComplete() <= getCurrentCycle()-1) {
                     // Write back the result to the register file
                     loadBuffer.writeBack();
                     System.out.println("Instruction " + instruction.toString() + " wrote back result at cycle " + getCurrentCycle());
+                    loadBuffer.release();
                 }
             }
         }
@@ -319,10 +329,12 @@ public class Tomasulo {
         for (LoadStoreBuffer storeBuffer : storeBuffers) {
             if (storeBuffer.isOccupied()) {
                 Instruction instruction = storeBuffer.getInstruction();
-                if (instruction.getInstructionStatus().getExecutionComplete() != null && instruction.getInstructionStatus().getWriteBack() == null) {
+                if (instruction.getInstructionStatus().getExecutionComplete() != null && instruction.getInstructionStatus().getWriteBack() == null
+                        && instruction.getInstructionStatus().getExecutionComplete() <= getCurrentCycle()-1) {
                     // Write back the result to the register file
                     storeBuffer.writeBack();
                     System.out.println("Instruction " + instruction.toString() + " wrote back result at cycle " + getCurrentCycle());
+                    storeBuffer.release();
                 }
             }
         }
@@ -334,10 +346,11 @@ public class Tomasulo {
         for (ReservationStation station : addSubReservationStations) {
             if (station.isOccupied()) {
                 Instruction instruction = station.getInstruction();
-                if (instruction.getInstructionStatus().getExecutionComplete() != null && instruction.getInstructionStatus().getExecutionComplete() == getCurrentCycle()+1) {
+                if (instruction.getInstructionStatus().getExecutionComplete() != null &&
+                        instruction.getInstructionStatus().getExecutionComplete() <= getCurrentCycle()-1) {
                     // Broadcast the result to all reservation stations and load buffers
                     station.broadcastResult();
-                    System.out.println("Instruction " + instruction.toString() + " broadcasted result at cycle " + getCycleCount());
+                    System.out.println("Instruction " + instruction.toString() + " broadcasted result at cycle " + getCurrentCycle());
                 }
             }
         }
@@ -345,10 +358,11 @@ public class Tomasulo {
         for (ReservationStation station : mulDivReservationStations) {
             if (station.isOccupied()) {
                 Instruction instruction = station.getInstruction();
-                if (instruction.getInstructionStatus().getExecutionComplete() != null && instruction.getInstructionStatus().getExecutionComplete() == getCurrentCycle()+1) {
+                if (instruction.getInstructionStatus().getExecutionComplete() != null
+                        && instruction.getInstructionStatus().getExecutionComplete() <= getCurrentCycle()-1) {
                     // Broadcast the result to all reservation stations and load buffers
                     station.broadcastResult();
-                    System.out.println("Instruction " + instruction.toString() + " broadcasted result at cycle " + getCycleCount());
+                    System.out.println("Instruction " + instruction.toString() + " broadcasted result at cycle " + getCurrentCycle());
                 }
             }
         }
@@ -356,19 +370,43 @@ public class Tomasulo {
         for (LoadStoreBuffer loadBuffer : loadBuffers) {
             if (loadBuffer.isOccupied()) {
                 Instruction instruction = loadBuffer.getInstruction();
-                if (instruction.getInstructionStatus().getExecutionComplete() != null && instruction.getInstructionStatus().getExecutionComplete() == getCurrentCycle()+1) {
+                if (instruction.getInstructionStatus().getExecutionComplete() != null &&
+                        instruction.getInstructionStatus().getExecutionComplete() <= getCurrentCycle()-1) {
                     // Broadcast the result to all reservation stations and load buffers
                     loadBuffer.broadcastResult();
-                    System.out.println("Instruction " + instruction.toString() + " broadcasted result at cycle " + getCycleCount());
+                    System.out.println("Instruction " + instruction.toString() + " broadcasted result at cycle " + getCurrentCycle());
                 }
             }
         }
+    }
+    private static boolean isAllStationsEmpty() {
+        for (ReservationStation station : addSubReservationStations) {
+            if (station.isOccupied()) {
+                return false;
+            }
+        }
+        for (ReservationStation station : mulDivReservationStations) {
+            if (station.isOccupied()) {
+                return false;
+            }
+        }
+        for (LoadStoreBuffer loadBuffer : loadBuffers) {
+            if (loadBuffer.isOccupied()) {
+                return false;
+            }
+        }
+        for (LoadStoreBuffer storeBuffer : storeBuffers) {
+            if (storeBuffer.isOccupied()) {
+                return false;
+            }
+        }
+        return true;
     }
 
     public static void printStatus() {
         // Implementation for printing
         // Print the current cycle
-        System.out.println("**********************************************************Current Cycle: " + getCurrentCycle());
+        System.out.println("\n\n\n\n**********************************************************Current Cycle: " + getCurrentCycle() +"**************************************************************");
         // Print the current state of the load buffers
         System.out.println("Load Buffers: ");
         for (LoadStoreBuffer loadBuffer : loadBuffers) {
@@ -402,59 +440,50 @@ public class Tomasulo {
         System.out.println(Icache);
         System.out.println("-----------------------");
 
-        System.out.println("**********************************************************************************************************************************************************");
+        System.out.println("**********************************************************************************************************************************************************\n\n\n\n");
 
     }
     
     public static void printInstructions() {
             System.out.println(Icache);
     }
-    
-    private static int getCycleCount() {
-        return totalLoadStoreCycles + totalAddSubCycles + totalMulCycles + totalDivCycles;
-    }
+
     private static int getCurrentCycle(){
         return currentCycle;
     }
 
-    private static void incrementTotalCycles(Instruction instruction) {
-        // Increment the appropriate total cycle count based on the type of instruction
-        switch (instruction.getInstructionType()) {
-            case LOAD:
-            case STORE:
-                totalLoadStoreCycles++;
-                break;
-            case ADD:
-            case SUB:
-                totalAddSubCycles++;
-                break;
-            case MUL:
-            case DIV:
-                totalMulCycles++;
-                break;
-        }
-    }
     
     public static void simulate() {
         // Implementation for simulation
-        while (!Icache.isFinished()) {
-            if(!Icache.issueInstruction()) System.out.println("-----Cannot Issue the current "+
+        while (!Icache.isFinished() || !isAllStationsEmpty()) {
+            if(!Icache.isFinished() && !Icache.issueInstruction()) System.out.println("-----Cannot Issue the current "+
                                                 Icache.getCurrentInstruction().getInstructionType()+"Instruction-----");
             executeInstructions();
+            broadcastResult();
+            writeBack();
 
 
+            printStatus();
 
             currentCycle++;
+            if (currentCycle > 20) {
+                System.out.println("Simulation is taking too long. Terminating...");
+                break;
+            }
         }
+
+        System.out.println("===========================Total Cycles: " + (getCurrentCycle()-1));
     }
 
     public static void main(String[] args) {
         System.out.println("Hello World!");
         Tomasulo tomasulo = new Tomasulo();
+        registerFile.setR(2,10);
+        registerFile.setR(3,20);
         Tomasulo.loadDataFromFile("ins1.txt");
         Tomasulo.simulate();
 //        Tomasulo.printInstructions();
-        Tomasulo.printStatus();
+//        Tomasulo.printStatus();
     }
 
 }

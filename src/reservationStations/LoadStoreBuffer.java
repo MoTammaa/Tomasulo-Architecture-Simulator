@@ -29,9 +29,10 @@ public class LoadStoreBuffer extends Station{
             this.address = instruction.getImmediateOffset(); // assuming    L.D R1, 100
             this.fu = instruction.getRd();
         } else { // Store: read from register file
-            this.Q = Tomasulo.getRegisterFile().getQ(instruction.getRt());
+            this.Q = Tomasulo.getRegisterFile().getQ(instruction.getRd());
             if (this.Q.equals("0"))
                 this.fu = Tomasulo.getRegisterFile().getRegister(instruction.getRd());
+            this.address = instruction.getImmediateOffset();
         }
     }
 

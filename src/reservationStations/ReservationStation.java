@@ -29,11 +29,12 @@ public class ReservationStation extends Station {
             this.Vk = instruction.getImmediateOffset();
             this.Qk = "0";
         } else if ( instructionType == ITypes.BNEZ){
-            this.Qj = Tomasulo.getRegisterFile().getQ(instruction.getRs());
+            this.Qj = Tomasulo.getRegisterFile().getQ(instruction.getRd());
             if (this.Qj.equals("0"))
-                this.Vj = Tomasulo.getRegisterFile().getRegister(instruction.getRs());
+                this.Vj = Tomasulo.getRegisterFile().getRegister(instruction.getRd());
             this.Vk = "0";
             this.Qk = "0";
+            Tomasulo.getRegisterFile().setBTrue();
         } else {
             this.Qj = Tomasulo.getRegisterFile().getQ(instruction.getRs());
             this.Qk = Tomasulo.getRegisterFile().getQ(instruction.getRt());
