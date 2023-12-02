@@ -4,10 +4,13 @@ public class RegisterFile {
 
     private Register[] integerRegs;
     private Register[] floatingRegs;
+    private Register branch; // value is the output of the Branch (0 or 1)
+                             // status is that if there is a branch instruction in the pipeline 0/1
 
     public RegisterFile() {
         integerRegs = new Register[32];
         floatingRegs = new Register[32];
+        branch = new Register("B");
         for (int i = 0; i < 32; i++) {
             integerRegs[i] = new Register("R" + i);
             floatingRegs[i] = new Register("F" + i);
@@ -43,12 +46,33 @@ public class RegisterFile {
     public void setF(int index, Double value) {
         floatingRegs[index].setValue(value.toString());
     }
+    public void setBTrue() {
+        branch.setValue("1");
+    }
+    public void setBFalse() {
+        branch.setValue("0");
+    }
+    public Long getB() {
+        return Long.parseLong(branch.getValue());
+    }
 
     public String getRegister(String registerName) { // registerName = "R0" or "F0" // Floating or Integers
         if (registerName.charAt(0) == 'R') {
             return integerRegs[Integer.parseInt(registerName.substring(1))].getValue();
+        } else if ( registerName.charAt(0) == 'B') {
+            return branch.getValue();
         } else {
             return floatingRegs[Integer.parseInt(registerName.substring(1))].getValue();
+        }
+    }
+
+    public void setRegisterStatus(String registerName, String registerStatus) { // registerName = "R0" or "F0" // Floating or Integers
+        if (registerName.charAt(0) == 'R') {
+            integerRegs[Integer.parseInt(registerName.substring(1))].setRegisterStatus(registerStatus);
+        } else if ( registerName.charAt(0) == 'B') {
+            branch.setRegisterStatus(registerStatus);
+        } else {
+            floatingRegs[Integer.parseInt(registerName.substring(1))].setRegisterStatus(registerStatus);
         }
     }
 
@@ -97,8 +121,14 @@ public class RegisterFile {
     public String getQ(String rs) {
         if (rs.charAt(0) == 'R') {
             return integerRegs[Integer.parseInt(rs.substring(1))].getRegisterStatus();
+        } else if (rs.charAt(0) == 'B') {
+            return branch.getRegisterStatus();
         } else {
             return floatingRegs[Integer.parseInt(rs.substring(1))].getRegisterStatus();
         }
+    }
+
+    public boolean isThereBranchIssued() {
+        return branch.isReady();
     }
 }

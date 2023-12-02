@@ -23,20 +23,29 @@ public class ReservationStation {
         this.instructionType = instruction.getInstructionType();
         this.isOccupied=true;
 
-//        if (instructionType.toString().endsWith("I")) { // if instruction is immediate
-//            this.Qj = Tomasulo.getRegisterFile().getQ(instruction.getRs());
-//            if (this.Qj.equals("0"))
-//                this.Vj = Tomasulo.getRegisterFile().M(instruction.getRs());
-//            else
-//                this.Vj = instruction.getRs();
-//            this.Vk = instruction.getImmediateOffset();
-//        } else {
-//            this.Vj = Tomasulo.getRegisterFile().get(instruction.getRs());
-//            this.Vk = Tomasulo.getRegisterFile().get(instruction.getRt());
-//        }
-//
-//        this.Qj = Tomasulo.getRegisterFile().getQ(instruction.getRs());
-//        this.Qk = Tomasulo.getRegisterFile().getQ(instruction.getRt());
+        if (instructionType.toString().endsWith("I")) { // if instruction is immediate
+            this.Qj = Tomasulo.getRegisterFile().getQ(instruction.getRs());
+            if (this.Qj.equals("0"))
+                this.Vj = Tomasulo.getRegisterFile().getRegister(instruction.getRs());
+            this.Vk = instruction.getImmediateOffset();
+            this.Qk = "0";
+        } else if ( instructionType == ITypes.BNEZ){
+            this.Qj = Tomasulo.getRegisterFile().getQ(instruction.getRs());
+            if (this.Qj.equals("0"))
+                this.Vj = Tomasulo.getRegisterFile().getRegister(instruction.getRs());
+            this.Vk = "0";
+            this.Qk = "0";
+        } else {
+            this.Qj = Tomasulo.getRegisterFile().getQ(instruction.getRs());
+            this.Qk = Tomasulo.getRegisterFile().getQ(instruction.getRt());
+            if (this.Qj.equals("0"))
+                this.Vj = Tomasulo.getRegisterFile().getRegister(instruction.getRs());
+            if (this.Qk.equals("0"))
+                this.Vk = Tomasulo.getRegisterFile().getRegister(instruction.getRt());
+        }
+
+        Tomasulo.getRegisterFile().setRegisterStatus(instruction.getRd(), reservationStationName);
+
     }
 
     public void setInstructionType(ITypes instructionType) {
