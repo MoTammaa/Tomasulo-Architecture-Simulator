@@ -136,6 +136,6 @@ case "SUB":
     }
 
     public String toString() {
-        return "Type: " + instructionType + " Rs: " + Rs + " Rd: " + Rd + " Rt: " + Rt + " Immediate: " + immediateOffset;
+        return instructionType + " (Rd:" + Rd + "), (Rs:" + Rs + "),"+ (!instructionType.endsWith("i")&&!instructionType.endsWith("I") ? "  (Rt:" + Rt + ")" :" imm: " + immediateOffset);
     }
 }

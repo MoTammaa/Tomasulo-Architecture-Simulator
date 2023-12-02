@@ -63,11 +63,10 @@ public class LoadStoreBuffer {
 
     @Override
     public String toString() {
-        return "LoadStoreBuffer{" +
-                "bufferName='" + bufferName + '\'' +
-                ", isOccupied=" + isOccupied +
+        return  bufferName + "{" +
+                "Busy=" + (isOccupied?1:0) +
                 ", address='" + address + '\'' +
-                ", fu='" + fu + '\'' +
+                ", "+(bufferName.startsWith("L") ? "Dest='" : "Src='") + fu + '\'' +
                 ", Q='" + Q + '\'' +
                 ", instruction=" + instruction +
                 '}';

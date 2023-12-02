@@ -215,7 +215,6 @@ public class Tomasulo {
 
         startExecutionInBuffer(storeBuffers);
 
-        Tomasulo.printStatus();
 
     }
 
@@ -337,6 +336,7 @@ public class Tomasulo {
         Tomasulo.loadDataFromFile("ins1.txt");
         Tomasulo.simulate();
 //        Tomasulo.printInstructions();
+        Tomasulo.printStatus();
     }
 
 }

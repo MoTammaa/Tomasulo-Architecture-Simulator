@@ -18,6 +18,7 @@ public class ReservationStation {
 
     public void issueInstruction(Instruction instruction) {
         this.instruction = instruction;
+        this.instructionType = instruction.getInstructionType();
         this.isOccupied=true;
     }
 
@@ -82,10 +83,9 @@ public class ReservationStation {
     }
     @Override
     public String toString() {
-        return "ReservationStation{" +
-                "reservationStationName='" + reservationStationName + '\'' +
-                ", isOccupied=" + isOccupied +
-                ", instructionType='" + instructionType + '\'' +
+        return   reservationStationName + "{" +
+                "Busy=" + (isOccupied? 1 : 0) +
+                ", Op='" + instructionType + '\'' +
                 ", Vj='" + Vj + '\'' +
                 ", Vk='" + Vk + '\'' +
                 ", Qj='" + Qj + '\'' +
