@@ -95,6 +95,6 @@ public class ReservationStation {
     }
 
     public boolean isReady() {
-        return Qj.equals("0") && Qk.equals("0");
+        return Qj!= null && Qk!=null && Qj.equals("0") && Qk.equals("0");
     }
 }

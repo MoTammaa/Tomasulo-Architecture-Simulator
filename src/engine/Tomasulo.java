@@ -89,7 +89,7 @@ public class Tomasulo {
                     Icache.addInstruction(instruction);
                 }
             }
-            System.out.println(".......\n"+Arrays.toString(addSubReservationStations));
+//            System.out.println(".......\n"+Arrays.toString(addSubReservationStations));
             totalInstructions = instructionIndex;
         } catch (IOException e) {
             System.err.println("Error reading from file: " + e.getMessage());
@@ -165,7 +165,7 @@ public class Tomasulo {
             // Issue the instruction to the load or store buffer
             loadStoreBuffer.issueInstruction(instruction);
             incrementTotalCycles(instruction);
-            System.out.println("Load/Store Instruction issued: " + instruction.toString());
+            //System.out.println("Load/Store Instruction issued: " + instruction.toString());
         } else {
             System.out.println("Load/Store buffer is occupied. Cannot issue instruction.");
             return false;
@@ -178,9 +178,9 @@ public class Tomasulo {
         if (addSubReservationStation != null) {
             instruction.getInstructionStatus().setIssue(getCurrentCycle());
             addSubReservationStation.issueInstruction(instruction);
-            System.out.println(addSubReservationStation);
+//            System.out.println(addSubReservationStation);
             incrementTotalCycles(instruction);
-            System.out.println("Add/Sub Instruction issued: " + instruction.toString());
+//            System.out.println("Add/Sub Instruction issued: " + instruction.toString());
         } else {
             System.out.println("Add/Sub reservation station is occupied. Cannot issue instruction.");
             return false;
@@ -198,7 +198,7 @@ public class Tomasulo {
             // Other logic for handling the issue process
             // Increment the appropriate total cycle count based on the type of instruction
             incrementTotalCycles(instruction);
-            System.out.println("Mul/Div Instruction issued: " + instruction.toString());
+//            System.out.println("Mul/Div Instruction issued: " + instruction.toString());
         } else {
             System.out.println("Mul/Div reservation station is occupied. Cannot issue instruction.");
             return false;
@@ -215,6 +215,7 @@ public class Tomasulo {
 
         startExecutionInBuffer(storeBuffers);
 
+        Tomasulo.printStatus();
 
     }
 
@@ -254,8 +255,45 @@ public class Tomasulo {
         // Implementation for broadcasting results
     }
 
-    public static void print() {
+    public static void printStatus() {
         // Implementation for printing
+        // Print the current cycle
+        System.out.println("**********************************************************Current Cycle: " + getCurrentCycle());
+        // Print the current state of the load buffers
+        System.out.println("Load Buffers: ");
+        for (LoadStoreBuffer loadBuffer : loadBuffers) {
+            System.out.println(loadBuffer);
+        }
+        System.out.println("-----------------------");
+        // Print the current state of the store buffers
+        System.out.println("Store Buffers: ");
+        for (LoadStoreBuffer storeBuffer : storeBuffers) {
+            System.out.println(storeBuffer);
+        }
+        System.out.println("-----------------------");
+        // Print the current state of the add/sub reservation stations
+        System.out.println("Add/Sub Reservation Stations: ");
+        for (ReservationStation addSubReservationStation : addSubReservationStations) {
+            System.out.println(addSubReservationStation);
+        }
+        System.out.println("-----------------------");
+        // Print the current state of the multiply/divide reservation stations
+        System.out.println("Mul/Div Reservation Stations: ");
+        for (ReservationStation mulDivReservationStation : mulDivReservationStations) {
+            System.out.println(mulDivReservationStation);
+        }
+        System.out.println("-----------------------");
+        // Print the current state of the register file
+        System.out.println("Register File: ");
+        System.out.println(registerFile);
+        System.out.println("-----------------------");
+        // Print the current state of the instructions
+        System.out.println("Instructions: ");
+        System.out.println(Icache);
+        System.out.println("-----------------------");
+
+        System.out.println("**********************************************************************************************************************************************************");
+
     }
     
     public static void printInstructions() {
@@ -289,12 +327,7 @@ public class Tomasulo {
         while (!Icache.isFinished()) {
             if(!Icache.issueInstruction()) System.out.println("-----Cannot Issue the current "+
                                                 Icache.getCurrentInstruction().getInstructionType()+"Instruction-----");
-        }
-        // print reservation stations
-        System.out.println("Reservation Stations:");
-        System.out.println("Add/Sub:");
-        for (ReservationStation station : addSubReservationStations) {
-            System.out.println(station);
+            executeInstructions();
         }
     }
 
@@ -303,7 +336,7 @@ public class Tomasulo {
         Tomasulo tomasulo = new Tomasulo();
         Tomasulo.loadDataFromFile("ins1.txt");
         Tomasulo.simulate();
-        Tomasulo.printInstructions();
+//        Tomasulo.printInstructions();
     }
 
 }
