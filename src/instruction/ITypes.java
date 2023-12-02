@@ -27,8 +27,12 @@ public enum ITypes {
 
     public static ITypes getInstructionType(String instructionType) {
         for (ITypes iType : ITypes.values()) {
-            if (iType.getInstructionType().equals(instructionType)) {
+            if (iType.getInstructionType().equalsIgnoreCase(instructionType)) {
                 return iType;
+            } else if (instructionType.equalsIgnoreCase("MULTI")) {
+                return MULI;
+            } else if (instructionType.equalsIgnoreCase("MULT")) {
+                return MUL;
             }
         }
         return null;

@@ -1,17 +1,17 @@
 package reservationStations;
 
+import engine.Tomasulo;
 import instruction.Instruction;
 
-public class LoadStoreBuffer {
+public class LoadStoreBuffer extends Station{
     private final String bufferName;
     private boolean isOccupied=false;
     private String address;
     private String fu;
     private String Q;
-    private Instruction instruction;
 
     public LoadStoreBuffer(String bufferName) {
-        this.bufferName = bufferName;
+        this.bufferName = this.name = bufferName;
         if (bufferName.startsWith("L")) {
             this.Q = "0";
         }
@@ -23,6 +23,16 @@ public class LoadStoreBuffer {
     public void issueInstruction(Instruction instruction) {
         this.instruction = instruction;
         this.isOccupied=true;
+
+        if (bufferName.startsWith("L")) { // Load: read from memory
+            this.Q = "0";
+            this.address = instruction.getImmediateOffset(); // assuming    L.D R1, 100
+            this.fu = instruction.getRd();
+        } else { // Store: read from register file
+            this.Q = Tomasulo.getRegisterFile().getQ(instruction.getRt());
+            if (this.Q.equals("0"))
+                this.fu = Tomasulo.getRegisterFile().getRegister(instruction.getRd());
+        }
     }
 
     public boolean isOccupied() {
@@ -63,10 +73,6 @@ public class LoadStoreBuffer {
         return Q;
     }
 
-    public Instruction getInstruction() {
-        return instruction;
-    }
-
     @Override
     public String toString() {
         return  bufferName + "{" +
@@ -76,5 +82,14 @@ public class LoadStoreBuffer {
                 ", Q='" + Q + '\'' +
                 ", instruction=" + instruction +
                 '}';
+    }
+
+    public void writeBack() {
+        if (bufferName.startsWith("L")) { // Load: write to register file
+            Tomasulo.getRegisterFile().setRegisterValue(instruction.getRd(), instruction.execute(this));
+            Tomasulo.getRegisterFile().setRegisterStatus(instruction.getRd(), "0");
+        } else { // Store: write to memory
+            Tomasulo.getDataCache().setM(address, instruction.execute(this));
+        }
     }
 }

@@ -4,7 +4,7 @@ import engine.Tomasulo;
 import instruction.ITypes;
 import instruction.Instruction;
 
-public class ReservationStation {
+public class ReservationStation extends Station {
     private final String reservationStationName;
     private boolean isOccupied=false;
     private ITypes instructionType;
@@ -12,10 +12,9 @@ public class ReservationStation {
     private String Vk;
     private String Qj;
     private String Qk;
-    private Instruction instruction;
 
     public ReservationStation(String reservationStationName) {
-        this.reservationStationName = reservationStationName;
+        this.reservationStationName = this.name = reservationStationName;
     }
 
     public void issueInstruction(Instruction instruction) {
@@ -91,10 +90,6 @@ public class ReservationStation {
     public String getQk() {
         return Qk;
     }
-
-    public Instruction getInstruction() {
-        return instruction;
-    }
     
     public boolean isOccupied() {
         return isOccupied;
@@ -124,37 +119,9 @@ public class ReservationStation {
         return Qj!= null && Qk!=null && Qj.equals("0") && Qk.equals("0");
     }
 
-    public void broadcastResult() {
-        String result = instruction.execute(this);
 
-        for (ReservationStation reservationStation : Tomasulo.getAddSubReservationStations()) {
-            if (reservationStation.getQj().equals(reservationStationName)) {
-                reservationStation.setQj("0");
-                reservationStation.setVj(result);
-            }
-            if (reservationStation.getQk().equals(reservationStationName)) {
-                reservationStation.setQk("0");
-                reservationStation.setVk(result);
-            }
-        }
-
-        for (ReservationStation reservationStation : Tomasulo.getMulDivReservationStations()) {
-            if (reservationStation.getQj().equals(reservationStationName)) {
-                reservationStation.setQj("0");
-                reservationStation.setVj(result);
-            }
-            if (reservationStation.getQk().equals(reservationStationName)) {
-                reservationStation.setQk("0");
-                reservationStation.setVk(result);
-            }
-        }
-
-        // now for the store buffers
-        for (LoadStoreBuffer sBuffer : Tomasulo.getStoreBuffers()) {
-            if (sBuffer.getQ().equals(reservationStationName)) {
-                sBuffer.setQ("0");
-                sBuffer.setFu(result);
-            }
-        }
+    public void writeBack() {
+        Tomasulo.getRegisterFile().setRegisterValue(instruction.getRd(), instruction.execute(this));
+        Tomasulo.getRegisterFile().setRegisterStatus(instruction.getRd(), "0");
     }
 }

@@ -27,6 +27,7 @@ public class Tomasulo {
     private static final int MAX_REGISTERS = 32;
     private static final int MAX_INSTRUCTIONS = 100;
     private static InstructionCache Icache;
+    private static DataCache Dcache;
     
     private static LoadStoreBuffer[] loadBuffers;
     private static int totalLoadBuffers;
@@ -76,6 +77,7 @@ public class Tomasulo {
         this.totalMulCycles = DEFAULT_CYCLES;
         this.totalDivCycles = DEFAULT_CYCLES;
         this.Icache = new InstructionCache(10);
+        this.Dcache = new DataCache(500);
     }
 
     // getters
@@ -93,6 +95,12 @@ public class Tomasulo {
     }
     public static RegisterFile getRegisterFile() {
         return registerFile;
+    }
+    public static DataCache getDataCache() {
+        return Dcache;
+    }
+    public static InstructionCache getInstructionCache() {
+        return Icache;
     }
 
 
@@ -274,6 +282,50 @@ public class Tomasulo {
 
     public static void writeBack() {
         // Implementation for writing back results
+        // When an instruction finishes execution, in the next cycle, write back the result to the register file
+        for (ReservationStation station : addSubReservationStations) {
+            if (station.isOccupied()) {
+                Instruction instruction = station.getInstruction();
+                if (instruction.getInstructionStatus().getExecutionComplete() != null && instruction.getInstructionStatus().getWriteBack() == null) {
+                    // Write back the result to the register file
+                    station.writeBack();
+                    System.out.println("Instruction " + instruction.toString() + " wrote back result at cycle " + getCurrentCycle());
+                }
+            }
+        }
+
+        for (ReservationStation station : mulDivReservationStations) {
+            if (station.isOccupied()) {
+                Instruction instruction = station.getInstruction();
+                if (instruction.getInstructionStatus().getExecutionComplete() != null && instruction.getInstructionStatus().getWriteBack() == null) {
+                    // Write back the result to the register file
+                    station.writeBack();
+                    System.out.println("Instruction " + instruction.toString() + " wrote back result at cycle " + getCurrentCycle());
+                }
+            }
+        }
+
+        for (LoadStoreBuffer loadBuffer : loadBuffers) {
+            if (loadBuffer.isOccupied()) {
+                Instruction instruction = loadBuffer.getInstruction();
+                if (instruction.getInstructionStatus().getExecutionComplete() != null && instruction.getInstructionStatus().getWriteBack() == null) {
+                    // Write back the result to the register file
+                    loadBuffer.writeBack();
+                    System.out.println("Instruction " + instruction.toString() + " wrote back result at cycle " + getCurrentCycle());
+                }
+            }
+        }
+
+        for (LoadStoreBuffer storeBuffer : storeBuffers) {
+            if (storeBuffer.isOccupied()) {
+                Instruction instruction = storeBuffer.getInstruction();
+                if (instruction.getInstructionStatus().getExecutionComplete() != null && instruction.getInstructionStatus().getWriteBack() == null) {
+                    // Write back the result to the register file
+                    storeBuffer.writeBack();
+                    System.out.println("Instruction " + instruction.toString() + " wrote back result at cycle " + getCurrentCycle());
+                }
+            }
+        }
     }
 
     public static void broadcastResult() {
@@ -285,6 +337,28 @@ public class Tomasulo {
                 if (instruction.getInstructionStatus().getExecutionComplete() != null && instruction.getInstructionStatus().getExecutionComplete() == getCurrentCycle()+1) {
                     // Broadcast the result to all reservation stations and load buffers
                     station.broadcastResult();
+                    System.out.println("Instruction " + instruction.toString() + " broadcasted result at cycle " + getCycleCount());
+                }
+            }
+        }
+
+        for (ReservationStation station : mulDivReservationStations) {
+            if (station.isOccupied()) {
+                Instruction instruction = station.getInstruction();
+                if (instruction.getInstructionStatus().getExecutionComplete() != null && instruction.getInstructionStatus().getExecutionComplete() == getCurrentCycle()+1) {
+                    // Broadcast the result to all reservation stations and load buffers
+                    station.broadcastResult();
+                    System.out.println("Instruction " + instruction.toString() + " broadcasted result at cycle " + getCycleCount());
+                }
+            }
+        }
+
+        for (LoadStoreBuffer loadBuffer : loadBuffers) {
+            if (loadBuffer.isOccupied()) {
+                Instruction instruction = loadBuffer.getInstruction();
+                if (instruction.getInstructionStatus().getExecutionComplete() != null && instruction.getInstructionStatus().getExecutionComplete() == getCurrentCycle()+1) {
+                    // Broadcast the result to all reservation stations and load buffers
+                    loadBuffer.broadcastResult();
                     System.out.println("Instruction " + instruction.toString() + " broadcasted result at cycle " + getCycleCount());
                 }
             }

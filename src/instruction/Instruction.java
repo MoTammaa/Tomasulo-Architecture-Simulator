@@ -2,6 +2,9 @@ package instruction;
 
 import engine.Tomasulo;
 import reservationStations.ReservationStation;
+import reservationStations.Station;
+
+import java.util.InputMismatchException;
 
 public class Instruction {
     private ITypes instructionType;
@@ -36,11 +39,14 @@ public class Instruction {
             case SUBI:
                 totalCycles = Tomasulo.ADDI_CYCLES;
                 break;
-            case LOAD:
+            case LOAD, L_D:
                 totalCycles = Tomasulo.LOAD_CYCLES;
                 break;
-            case STORE:
+            case STORE, S_D:
                 totalCycles = Tomasulo.STORE_CYCLES;
+                break;
+            case BNEZ:
+                totalCycles = Tomasulo.BNEZ_CYCLES;
                 break;
             default:
                 System.err.println("Invalid instruction type: " + instructionType);
@@ -97,24 +103,24 @@ public class Instruction {
         this.instructionStatus = instructionStatus;
     }
 
-    public String execute(ReservationStation reservationStation){
+    public String execute(Station station){
         	String result;
         	switch (instructionType) {
             case ADD, ADDI:
-                result = ( Rs.startsWith("R") ? Long.parseLong(reservationStation.getVj()) : Double.parseDouble(reservationStation.getVj()))
-                            + ( Rt.startsWith("R") || instructionType.toString().endsWith("I") ? Long.parseLong(reservationStation.getVk()) : Double.parseDouble(reservationStation.getVk())) + "";
+                result = ( Rs.startsWith("R") ? Long.parseLong(((ReservationStation)station).getVj()) : Double.parseDouble(((ReservationStation)station).getVj()))
+                            + ( Rt.startsWith("R") || instructionType.toString().endsWith("I") ? Long.parseLong(((ReservationStation)station).getVk()) : Double.parseDouble(((ReservationStation)station).getVk())) + "";
                 break;
             case SUB, SUBI:
-                result = ( Rs.startsWith("R") ? Long.parseLong(reservationStation.getVj()) : Double.parseDouble(reservationStation.getVj()))
-                            - ( Rt.startsWith("R") || instructionType.toString().endsWith("I") ? Long.parseLong(reservationStation.getVk()) : Double.parseDouble(reservationStation.getVk())) + "";
+                result = ( Rs.startsWith("R") ? Long.parseLong(((ReservationStation)station).getVj()) : Double.parseDouble(((ReservationStation)station).getVj()))
+                            - ( Rt.startsWith("R") || instructionType.toString().endsWith("I") ? Long.parseLong(((ReservationStation)station).getVk()) : Double.parseDouble(((ReservationStation)station).getVk())) + "";
                 break;
             case MUL, MULI:
-                result = ( Rs.startsWith("R") ? Long.parseLong(reservationStation.getVj()) : Double.parseDouble(reservationStation.getVj()))
-                            * ( Rt.startsWith("R") || instructionType.toString().endsWith("I") ? Long.parseLong(reservationStation.getVk()) : Double.parseDouble(reservationStation.getVk())) + "";
+                result = ( Rs.startsWith("R") ? Long.parseLong(((ReservationStation)station).getVj()) : Double.parseDouble(((ReservationStation)station).getVj()))
+                            * ( Rt.startsWith("R") || instructionType.toString().endsWith("I") ? Long.parseLong(((ReservationStation)station).getVk()) : Double.parseDouble(((ReservationStation)station).getVk())) + "";
                 break;
             case DIV, DIVI:
-                result = ( Rs.startsWith("R") ? Long.parseLong(reservationStation.getVj()) : Double.parseDouble(reservationStation.getVj()))
-                            / ( Rt.startsWith("R") || instructionType.toString().endsWith("I") ? Long.parseLong(reservationStation.getVk()) : Double.parseDouble(reservationStation.getVk())) + "";
+                result = ( Rs.startsWith("R") ? Long.parseLong(((ReservationStation)station).getVj()) : Double.parseDouble(((ReservationStation)station).getVj()))
+                            / ( Rt.startsWith("R") || instructionType.toString().endsWith("I") ? Long.parseLong(((ReservationStation)station).getVk()) : Double.parseDouble(((ReservationStation)station).getVk())) + "";
                 break;
             case LOAD, L_D:
                 result = Rs;
@@ -123,7 +129,7 @@ public class Instruction {
                 result = null;
                 break;
             case BNEZ:
-                result = ( reservationStation.getVj().equals("0") || reservationStation.getVj().equals("0.0") ? "0" : "1" );
+                result = ( ((ReservationStation)station).getVj().equals("0") || ((ReservationStation)station).getVj().equals("0.0") ? "0" : "1" );
                 break;
             default:
                 result = null;
@@ -138,6 +144,10 @@ public class Instruction {
 
         if (parts.length >= 2) {
             String opcode = parts[0];
+            ITypes type = ITypes.getInstructionType(opcode);
+            if (type == null) {
+                throw new InputMismatchException("Invalid instruction type: '" + opcode+ "'");
+            }
             String dest = parts[1];
             String src1 = null;
             String src2 = null;
@@ -151,15 +161,15 @@ public class Instruction {
                 src2 = parts[3];
             }
 
-            if (opcode.equals("LOAD") || opcode.equals("STORE")) {
+            if (type == ITypes.LOAD || type == ITypes.STORE || type == ITypes.L_D || type == ITypes.S_D) {
                 immediate = parts[2];
                 src1 = null;
-            } else if (opcode.equals("ADDI") || opcode.equals("SUBI") || opcode.equals("MULTI") || opcode.equals("DIVI")) {
+            } else if (type == ITypes.ADDI || type == ITypes.SUBI || type == ITypes.MULI || type == ITypes.DIVI) {
                 immediate = parts[3];
             }
 
             Instruction instruction = new Instruction();
-            instruction.setInstructionType(ITypes.getInstructionType(opcode));
+            instruction.setInstructionType(type);
             instruction.setRs(src1);
             instruction.setRd(dest);
             instruction.setRt(src2);
@@ -173,6 +183,11 @@ public class Instruction {
     }
 
     public String toString() {
-        return instructionType + " (Rd:" + Rd + "), (Rs:" + Rs + "),"+ (!instructionType.toString().endsWith("i")&&!instructionType.toString().endsWith("I") ? "  (Rt:" + Rt + ")" :" imm: " + immediateOffset);
+        return instructionType + " (Rd:" + Rd + "), (Rs:" + Rs + "),"+ (!instructionType.toString().endsWith("i")&&
+                                                                        !instructionType.toString().endsWith("I") &&
+                                                                        !instructionType.toString().startsWith("L") &&
+                                                                        !instructionType.toString().startsWith("S")?
+                                                                            "  (Rt:" + Rt + ")" : " imm: " + immediateOffset);
     }
+
 }
