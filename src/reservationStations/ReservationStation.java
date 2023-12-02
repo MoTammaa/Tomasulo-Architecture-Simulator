@@ -3,7 +3,7 @@ package reservationStations;
 import instruction.Instruction;
 
 public class ReservationStation {
-    private String reservationStationName;
+    private final String reservationStationName;
     private boolean isOccupied=false;
     private String instructionType;
     private String Vj;
@@ -19,6 +19,54 @@ public class ReservationStation {
     public void issueInstruction(Instruction instruction) {
         this.instruction = instruction;
         this.isOccupied=true;
+    }
+
+    public void setInstructionType(String instructionType) {
+        this.instructionType = instructionType;
+    }
+
+    public void setVj(String vj) {
+        Vj = vj;
+    }
+
+    public void setVk(String vk) {
+        Vk = vk;
+    }
+
+    public void setQj(String qj) {
+        Qj = qj;
+    }
+
+    public void setQk(String qk) {
+        Qk = qk;
+    }
+
+    public String getReservationStationName() {
+        return reservationStationName;
+    }
+
+    public String getInstructionType() {
+        return instructionType;
+    }
+
+    public String getVj() {
+        return Vj;
+    }
+
+    public String getVk() {
+        return Vk;
+    }
+
+    public String getQj() {
+        return Qj;
+    }
+
+    public String getQk() {
+        return Qk;
+    }
+
+    public Instruction getInstruction() {
+        return instruction;
     }
     
     public boolean isOccupied() {
@@ -44,5 +92,9 @@ public class ReservationStation {
                 ", Qk='" + Qk + '\'' +
                 ", instruction=" + instruction +
                 '}';
+    }
+
+    public boolean isReady() {
+        return Qj.equals("0") && Qk.equals("0");
     }
 }

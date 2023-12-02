@@ -86,4 +86,11 @@ public class RegisterFile {
         return str.toString();
     }
 
+    public boolean isReady(String rs) {
+        if (rs.charAt(0) == 'R') {
+            return integerRegs[Integer.parseInt(rs.substring(1))].isReady();
+        } else {
+            return floatingRegs[Integer.parseInt(rs.substring(1))].isReady();
+        }
+    }
 }

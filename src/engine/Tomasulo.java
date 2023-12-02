@@ -11,9 +11,18 @@ import registerFile.*;
 import reservationStations.*;
 
 public class Tomasulo {
+
+    public static final int LOAD_CYCLES = 1;
+    public static final int STORE_CYCLES = 2;
+    public static final int ADD_CYCLES = 2;
+    public static final int SUB_CYCLES = 2;
+    public static final int MUL_CYCLES = 5;
+    public static final int DIV_CYCLES = 10;
+    public static final int BNEZ_CYCLES = 1;
+    public static final int ADDI_CYCLES = 1;
     private static final int MAX_LOAD_BUFFERS = 10;
     private static final int MAX_STORE_BUFFERS = 10;
-    private static final int MAX_ADD_STATIONS = 2;
+    private static final int MAX_ADD_STATIONS = 3;
     private static final int MAX_MUL_DIV_STATIONS = 10;
     private static final int MAX_REGISTERS = 32;
     private static final int MAX_INSTRUCTIONS = 100;
@@ -73,12 +82,11 @@ public class Tomasulo {
             String line;
             int instructionIndex = 0;
             while ((line = reader.readLine()) != null) {
-                Instruction instruction = parseInstruction(line);
+                Instruction instruction = Instruction.parseInstruction(line);
                 if (instruction != null) {
                     instructions[instructionIndex] = instruction;
                     instructionIndex++;
                     Icache.addInstruction(instruction);
-                    issueInstruction(instruction);
                 }
             }
             System.out.println(".......\n"+Arrays.toString(addSubReservationStations));
@@ -134,19 +142,20 @@ public class Tomasulo {
     private static ReservationStation getAvailableMulDivReservationStation() {
         return getFirstAvailableReservationStation(mulDivReservationStations);
     }
-    public static void issueInstruction(Instruction instruction) {
+    public static boolean issueInstruction(Instruction instruction) {
         // Determine the type of instruction and handle accordingly
         if (instruction.getInstructionType().equalsIgnoreCase("Load") || instruction.getInstructionType().equalsIgnoreCase("Store")) {
-            issueLoadStoreInstruction(instruction);
+            return issueLoadStoreInstruction(instruction);
         } else if (instruction.getInstructionType().equalsIgnoreCase("Add") || instruction.getInstructionType().equalsIgnoreCase("Sub")|| instruction.getInstructionType().equalsIgnoreCase("SUBI")|| instruction.getInstructionType().equalsIgnoreCase("ADDI")||instruction.getInstructionType().equalsIgnoreCase("bnez")) {
-            issueAddSubInstruction(instruction);
+            return issueAddSubInstruction(instruction);
         } else if (instruction.getInstructionType().equalsIgnoreCase("Mult") || instruction.getInstructionType().equalsIgnoreCase("Div")) {
-            issueMulDivInstruction(instruction);
+            return issueMulDivInstruction(instruction);
         } else {
             System.out.println("Unsupported instruction type: " + instruction.getInstructionType());
+            return false;
         }
     }
-    private static void issueLoadStoreInstruction(Instruction instruction) {
+    private static boolean issueLoadStoreInstruction(Instruction instruction) {
         // Get the available load or store buffer
         LoadStoreBuffer loadStoreBuffer = getAvailableLoadStoreBuffer(instruction);
         if (loadStoreBuffer != null && !loadStoreBuffer.isOccupied()) {
@@ -159,9 +168,11 @@ public class Tomasulo {
             System.out.println("Load/Store Instruction issued: " + instruction.toString());
         } else {
             System.out.println("Load/Store buffer is occupied. Cannot issue instruction.");
+            return false;
         }
+        return true;
     }
-    private static void issueAddSubInstruction(Instruction instruction) {
+    private static boolean issueAddSubInstruction(Instruction instruction) {
         // Get the available add/sub reservation station
         ReservationStation addSubReservationStation = getAvailableAddSubReservationStation();
         if (addSubReservationStation != null) {
@@ -172,9 +183,11 @@ public class Tomasulo {
             System.out.println("Add/Sub Instruction issued: " + instruction.toString());
         } else {
             System.out.println("Add/Sub reservation station is occupied. Cannot issue instruction.");
+            return false;
         }
+        return true;
     }
-	private static void issueMulDivInstruction(Instruction instruction) {
+	private static boolean issueMulDivInstruction(Instruction instruction) {
         // Get the available multiply/divide reservation station
         ReservationStation mulDivReservationStation = getAvailableMulDivReservationStation();
         if (mulDivReservationStation != null && !mulDivReservationStation.isOccupied()) {
@@ -188,10 +201,49 @@ public class Tomasulo {
             System.out.println("Mul/Div Instruction issued: " + instruction.toString());
         } else {
             System.out.println("Mul/Div reservation station is occupied. Cannot issue instruction.");
+            return false;
         }
+        return true;
     }
     public static void executeInstructions() {
         // Implementation for executing instructions
+        startExecutionInStation(addSubReservationStations);
+
+        startExecutionInStation(mulDivReservationStations);
+
+        startExecutionInBuffer(loadBuffers);
+
+        startExecutionInBuffer(storeBuffers);
+
+
+    }
+
+    private static void startExecutionInStation(ReservationStation[] addSubReservationStations) {
+        for (ReservationStation station : addSubReservationStations) {
+            if (station.isOccupied()) {
+                Instruction instruction = station.getInstruction();
+                if (instruction.getInstructionStatus().getIssue() != null && instruction.getInstructionStatus().getExecutionStart() == null) {
+                    // check if the operands are ready
+                    if (station.isReady()) {
+                        instruction.startExecution(getCurrentCycle());
+                        System.out.println("Instruction " + instruction.toString() + " started execution at cycle " + getCurrentCycle());
+                    }
+//                  else System.out.println("Instruction " + instruction.toString() + " is not ready to start execution at cycle " + getCurrentCycle());
+                }
+            }
+        }
+    }
+
+    private static void startExecutionInBuffer(LoadStoreBuffer[] buffers) {
+        for (LoadStoreBuffer lsBuffer : buffers) {
+            if (lsBuffer.isOccupied()) {
+                Instruction instruction = lsBuffer.getInstruction();
+                if (instruction.getInstructionStatus().getIssue() != null && instruction.getInstructionStatus().getExecutionStart() == null) {
+                    instruction.startExecution(getCurrentCycle());
+                    System.out.println("Instruction " + instruction.toString() + " started execution at cycle " + getCurrentCycle());
+                }
+            }
+        }
     }
 
     public static void writeBack() {
@@ -234,51 +286,24 @@ public class Tomasulo {
     
     public static void simulate() {
         // Implementation for simulation
-
+        while (!Icache.isFinished()) {
+            if(!Icache.issueInstruction()) System.out.println("-----Cannot Issue the current "+
+                                                Icache.getCurrentInstruction().getInstructionType()+"Instruction-----");
+        }
+        // print reservation stations
+        System.out.println("Reservation Stations:");
+        System.out.println("Add/Sub:");
+        for (ReservationStation station : addSubReservationStations) {
+            System.out.println(station);
+        }
     }
 
     public static void main(String[] args) {
         System.out.println("Hello World!");
         Tomasulo tomasulo = new Tomasulo();
-        tomasulo.loadDataFromFile("ins1.txt");
-        tomasulo.printInstructions();
+        Tomasulo.loadDataFromFile("ins1.txt");
+        Tomasulo.simulate();
+        Tomasulo.printInstructions();
     }
-    private static Instruction parseInstruction(String line) {
-        String[] parts = line.split("\\s*,\\s*|\\s*\\(\\s*|\\s*\\)\\s*|\\s{1,}");
 
-        if (parts.length >= 2) {
-            String opcode = parts[0];
-            String dest = parts[1];
-            String src1 = null;
-            String src2 = null;
-            String immediate = null;
-
-            if (parts.length >= 3) {
-                src1 = parts[2];
-            }
-
-            if (parts.length >= 4) {
-                src2 = parts[3];
-            }
-
-            if (opcode.equals("LOAD") || opcode.equals("STORE")) {
-                immediate = parts[2];
-                src1 = null;
-            } else if (opcode.equals("ADDI") || opcode.equals("SUBI") || opcode.equals("MULTI") || opcode.equals("DIVI")) {
-                immediate = parts[3];
-            }
-
-            Instruction instruction = new Instruction();
-            instruction.setInstructionType(opcode);
-            instruction.setRs(src1);
-            instruction.setRd(dest);
-            instruction.setRt(src2);
-            instruction.setImmediateOffset(immediate);
-
-            return instruction;
-        } else {
-            System.out.println("Invalid instruction format: " + line);
-            return null;
-        }
-    }
 }

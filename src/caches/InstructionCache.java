@@ -1,5 +1,6 @@
 package caches;
 
+import engine.Tomasulo;
 import instruction.Instruction;
 
 public class InstructionCache extends Cache{
@@ -31,6 +32,7 @@ public class InstructionCache extends Cache{
     }
     public boolean issueInstruction() {
         if (PC <= lastInstruction) {
+            if (!Tomasulo.issueInstruction(this.instructions[PC])) return false;
             PC++;
             return true;
         } else {

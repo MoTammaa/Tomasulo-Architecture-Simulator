@@ -8,19 +8,19 @@ public class Register {
 
     public Register(String registerName, String registerStatus, String value, String type) {
         this.registerName = registerName;
-        this.registerStatus = registerStatus;  //"valid" or The name of the reservation station Tag that will write to this register
+        this.registerStatus = registerStatus;  //"0" or The name of the reservation station Tag that will write to this register
         this.value = value;
         this.type = type;
     }
     public Register(String registerName, String type) {
         this.registerName = registerName;
-        this.registerStatus = "valid";
+        this.registerStatus = "0";
         this.value = "0";
         this.type = type;
     }
     public Register(String registerName) {
         this.registerName = registerName;
-        this.registerStatus = "valid";
+        this.registerStatus = "0";
         this.value = "0";
         this.type = (registerName.charAt(0) == 'R')? "integer": "floating";
     }
@@ -47,5 +47,9 @@ public class Register {
         return "(" + registerName + (registerName.length() < 3? " ": "") + ": \t" +
                "Status: " + registerStatus + ", \t" +
                "Value: " + value + ")\n";
+    }
+
+    public boolean isReady() {
+        return registerStatus.equals("0");
     }
 }
