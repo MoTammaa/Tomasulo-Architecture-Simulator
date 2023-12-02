@@ -1,6 +1,7 @@
 package instruction;
 
 import engine.Tomasulo;
+import reservationStations.ReservationStation;
 
 public class Instruction {
     private ITypes instructionType;
@@ -95,6 +96,42 @@ public class Instruction {
     public void setInstructionStatus(InstructionStatus instructionStatus) {
         this.instructionStatus = instructionStatus;
     }
+
+    public String execute(ReservationStation reservationStation){
+        	String result;
+        	switch (instructionType) {
+            case ADD, ADDI:
+                result = ( Rs.startsWith("R") ? Long.parseLong(reservationStation.getVj()) : Double.parseDouble(reservationStation.getVj()))
+                            + ( Rt.startsWith("R") || instructionType.toString().endsWith("I") ? Long.parseLong(reservationStation.getVk()) : Double.parseDouble(reservationStation.getVk())) + "";
+                break;
+            case SUB, SUBI:
+                result = ( Rs.startsWith("R") ? Long.parseLong(reservationStation.getVj()) : Double.parseDouble(reservationStation.getVj()))
+                            - ( Rt.startsWith("R") || instructionType.toString().endsWith("I") ? Long.parseLong(reservationStation.getVk()) : Double.parseDouble(reservationStation.getVk())) + "";
+                break;
+            case MUL, MULI:
+                result = ( Rs.startsWith("R") ? Long.parseLong(reservationStation.getVj()) : Double.parseDouble(reservationStation.getVj()))
+                            * ( Rt.startsWith("R") || instructionType.toString().endsWith("I") ? Long.parseLong(reservationStation.getVk()) : Double.parseDouble(reservationStation.getVk())) + "";
+                break;
+            case DIV, DIVI:
+                result = ( Rs.startsWith("R") ? Long.parseLong(reservationStation.getVj()) : Double.parseDouble(reservationStation.getVj()))
+                            / ( Rt.startsWith("R") || instructionType.toString().endsWith("I") ? Long.parseLong(reservationStation.getVk()) : Double.parseDouble(reservationStation.getVk())) + "";
+                break;
+            case LOAD, L_D:
+                result = Rs;
+                break;
+            case STORE, S_D:
+                result = null;
+                break;
+            case BNEZ:
+                result = ( reservationStation.getVj().equals("0") || reservationStation.getVj().equals("0.0") ? "0" : "1" );
+                break;
+            default:
+                result = null;
+                System.err.println("Invalid instruction type: " + instructionType);
+        }
+        	return result;
+    }
+
 
     public static Instruction parseInstruction(String line) {
         String[] parts = line.split("\\s*,\\s*|\\s*\\(\\s*|\\s*\\)\\s*|\\s+");

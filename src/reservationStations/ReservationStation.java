@@ -123,4 +123,38 @@ public class ReservationStation {
     public boolean isReady() {
         return Qj!= null && Qk!=null && Qj.equals("0") && Qk.equals("0");
     }
+
+    public void broadcastResult() {
+        String result = instruction.execute(this);
+
+        for (ReservationStation reservationStation : Tomasulo.getAddSubReservationStations()) {
+            if (reservationStation.getQj().equals(reservationStationName)) {
+                reservationStation.setQj("0");
+                reservationStation.setVj(result);
+            }
+            if (reservationStation.getQk().equals(reservationStationName)) {
+                reservationStation.setQk("0");
+                reservationStation.setVk(result);
+            }
+        }
+
+        for (ReservationStation reservationStation : Tomasulo.getMulDivReservationStations()) {
+            if (reservationStation.getQj().equals(reservationStationName)) {
+                reservationStation.setQj("0");
+                reservationStation.setVj(result);
+            }
+            if (reservationStation.getQk().equals(reservationStationName)) {
+                reservationStation.setQk("0");
+                reservationStation.setVk(result);
+            }
+        }
+
+        // now for the store buffers
+        for (LoadStoreBuffer sBuffer : Tomasulo.getStoreBuffers()) {
+            if (sBuffer.getQ().equals(reservationStationName)) {
+                sBuffer.setQ("0");
+                sBuffer.setFu(result);
+            }
+        }
+    }
 }

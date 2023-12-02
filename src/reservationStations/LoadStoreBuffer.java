@@ -56,6 +56,12 @@ public class LoadStoreBuffer {
     public String getFu() {
         return fu;
     }
+    public void setQ(String Q) {
+        this.Q = Q;
+    }
+    public String getQ() {
+        return Q;
+    }
 
     public Instruction getInstruction() {
         return instruction;

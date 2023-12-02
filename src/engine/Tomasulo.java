@@ -50,6 +50,7 @@ public class Tomasulo {
     private static int totalDivCycles;
 
     private static final int DEFAULT_CYCLES = 2;
+    private static int currentCycle = 0;
 
     public Tomasulo() {
         this.loadBuffers = new LoadStoreBuffer[MAX_LOAD_BUFFERS];
@@ -277,6 +278,17 @@ public class Tomasulo {
 
     public static void broadcastResult() {
         // Implementation for broadcasting results
+        // When an instruction finishes execution, in the next cycle, broadcast the result to all reservation stations and load buffers
+        for (ReservationStation station : addSubReservationStations) {
+            if (station.isOccupied()) {
+                Instruction instruction = station.getInstruction();
+                if (instruction.getInstructionStatus().getExecutionComplete() != null && instruction.getInstructionStatus().getExecutionComplete() == getCurrentCycle()+1) {
+                    // Broadcast the result to all reservation stations and load buffers
+                    station.broadcastResult();
+                    System.out.println("Instruction " + instruction.toString() + " broadcasted result at cycle " + getCycleCount());
+                }
+            }
+        }
     }
 
     public static void printStatus() {
@@ -324,8 +336,11 @@ public class Tomasulo {
             System.out.println(Icache);
     }
     
-    private static int getCurrentCycle() {
+    private static int getCycleCount() {
         return totalLoadStoreCycles + totalAddSubCycles + totalMulCycles + totalDivCycles;
+    }
+    private static int getCurrentCycle(){
+        return currentCycle;
     }
 
     private static void incrementTotalCycles(Instruction instruction) {
@@ -352,6 +367,10 @@ public class Tomasulo {
             if(!Icache.issueInstruction()) System.out.println("-----Cannot Issue the current "+
                                                 Icache.getCurrentInstruction().getInstructionType()+"Instruction-----");
             executeInstructions();
+
+
+
+            currentCycle++;
         }
     }
 
