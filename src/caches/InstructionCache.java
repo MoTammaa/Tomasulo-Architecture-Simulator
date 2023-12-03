@@ -1,5 +1,6 @@
 package caches;
 
+import engine.Tomasulo;
 import instruction.Instruction;
 
 public class InstructionCache extends Cache{
@@ -10,10 +11,16 @@ public class InstructionCache extends Cache{
         this.instructions = new Instruction[size];
         this.size = size;
     }
+    public void setPC(int PC) {
+        this.PC = PC;
+    }
 
+    public Instruction[] getInstructions() {
+        return instructions;
+    }
 
     public int getCurrentCapacity() {
-        return Math.max(0,Math.min(lastInstruction,size-1));
+        return Math.max(0,Math.min(lastInstruction+1,size));
     }
 
     public int getCurrentInstructionIndex() {
@@ -31,6 +38,11 @@ public class InstructionCache extends Cache{
     }
     public boolean issueInstruction() {
         if (PC <= lastInstruction) {
+            if (Tomasulo.getRegisterFile().getRegister("B").equals("1")) return false;
+            if (!Tomasulo.issueInstruction(this.instructions[PC])) return false;
+
+            System.out.println("||||||||Instruction " + getCurrentInstruction().toString() + ":: issued at cycle " + Tomasulo.getCurrentCycle());
+
             PC++;
             return true;
         } else {
