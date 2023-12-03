@@ -11,6 +11,12 @@ public abstract class Station {
         return instruction;
     }
 
+    public abstract void issueInstruction(Instruction instruction);
+    public abstract boolean isOccupied();
+    public abstract boolean isReady();
+    public abstract void occupy();
+    public abstract void release();
+    public abstract void writeBack();
 
 
     public void broadcastResult() {

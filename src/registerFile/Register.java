@@ -33,6 +33,9 @@ public class Register {
     }
     public void setValue(String value) {
         this.value = value;
+        if (registerName.equals("R0") ) { // R0 is always 0 (h
+            this.value = "0";
+        }
     }
     public String getValue() {
         return value;
