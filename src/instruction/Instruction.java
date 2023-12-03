@@ -4,7 +4,9 @@ import engine.Tomasulo;
 import reservationStations.ReservationStation;
 import reservationStations.Station;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.InputMismatchException;
 
 public class Instruction {
@@ -13,10 +15,34 @@ public class Instruction {
     private String Rd;
     private String Rt;
     private String immediateOffset;
-    private InstructionStatus instructionStatus = new InstructionStatus();
+    private ArrayList<InstructionStatus> instructionStatuses = new ArrayList<>();
+
+    public Instruction() {
+    	instructionStatuses.add(new InstructionStatus());
+    }
+    public Instruction(ITypes instructionType, String rs, String rd, String rt) {
+        this.instructionType = instructionType;
+        Rs = rs;
+        Rd = rd;
+        Rt = rt;
+        instructionStatuses.add(new InstructionStatus());
+    }
+    public Instruction(ITypes instructionType, String rs, String rd, String rt, String immediateOffset) {
+        this.instructionType = instructionType;
+        Rs = rs;
+        Rd = rd;
+        Rt = rt;
+        this.immediateOffset = immediateOffset;
+        instructionStatuses.add(new InstructionStatus());
+    }
+    public void setWriteBack(int currentCycle) {
+    	this.instructionStatuses.get(instructionStatuses.size()-1).setWriteBack(currentCycle);
+    }
+
 
     public void setIssue(int currentCycle) {
-    	this.instructionStatus.setIssue(currentCycle);
+        instructionStatuses.add(new InstructionStatus());
+    	this.instructionStatuses.get(instructionStatuses.size()-1).setIssue(currentCycle);
     }
     public void startExecution(int currentCycle) {
         int totalCycles = 0;
@@ -52,8 +78,8 @@ public class Instruction {
                 System.err.println("Invalid instruction type: " + instructionType);
         }
 
-    	this.instructionStatus.setExecutionStart(currentCycle);
-        this.instructionStatus.setExecutionComplete(currentCycle+totalCycles-1);
+    	this.instructionStatuses.get(instructionStatuses.size()-1).setExecutionStart(currentCycle);
+        this.instructionStatuses.get(instructionStatuses.size()-1).setExecutionComplete(currentCycle+totalCycles-1);
     }
     public ITypes getInstructionType() {
         return instructionType;
@@ -96,11 +122,11 @@ public class Instruction {
     }
 
     public InstructionStatus getInstructionStatus() {
-        return instructionStatus;
+        return instructionStatuses.get(instructionStatuses.size()-1);
     }
 
     public void setInstructionStatus(InstructionStatus instructionStatus) {
-        this.instructionStatus = instructionStatus;
+        this.instructionStatuses.set(instructionStatuses.size()-1, instructionStatus);
     }
 
     public String execute(Station station){
@@ -166,6 +192,7 @@ public class Instruction {
             label = parts[0];
             line = parts[1];
         }
+//        System.out.println("line: " + line);
         parts = line.split("\\s*,\\s*|\\s*\\(\\s*|\\s*\\)\\s*|\\s+");
 
         if (parts.length >= 2) {
@@ -215,18 +242,24 @@ public class Instruction {
 
             return instruction;
         } else {
-            System.out.println("Invalid instruction format: " + line);
+            System.err.println("Invalid instruction format: " + line);
             return null;
         }
     }
 
     public String toString() {
+        StringBuilder statuses = new StringBuilder("[");
+        for (int i = 1; i < instructionStatuses.size(); i++) {
+            statuses.append(instructionStatuses.get(i).toString()).append((i == instructionStatuses.size()-1 ? "" : ", "));
+        }
+        statuses.append("]");
         return instructionType + " (Rd:" + Rd + "), (Rs:" + Rs + "),"+ (!instructionType.toString().endsWith("i")&&
                                                                         !instructionType.toString().endsWith("I") &&
                                                                         !instructionType.toString().startsWith("L") &&
                                                                         !instructionType.toString().startsWith("S") &&
                                                                         instructionType != ITypes.BNEZ?
-                                                                            "  (Rt:" + Rt + ")" : " imm: " + immediateOffset);
+                                                                            "  (Rt:" + Rt + ")" : " imm: " + immediateOffset) + " "
+                                                                + statuses.toString();
     }
 
 }

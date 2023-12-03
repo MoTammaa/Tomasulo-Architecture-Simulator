@@ -30,5 +30,9 @@ public class InstructionStatus {
     public Integer getWriteBack() {
     	return this.writeBack;
     }
+    @Override
+    public String toString() {
+    	return "[Iss: "+this.issue+" St: "+this.executionStart+" En: "+this.executionComplete+" WB: "+this.writeBack + "]";
+    }
 
 }

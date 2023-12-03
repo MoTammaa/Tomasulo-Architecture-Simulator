@@ -21,6 +21,10 @@ public class ReservationStation extends Station {
         this.instruction = instruction;
         this.instructionType = instruction.getInstructionType();
         this.isOccupied=true;
+        this.Vj = null;
+        this.Vk = null;
+        this.Qj = null;
+        this.Qk = null;
 
         if (instructionType.toString().endsWith("I")) { // if instruction is immediate
             this.Qj = Tomasulo.getRegisterFile().getQ(instruction.getRs());
@@ -29,7 +33,7 @@ public class ReservationStation extends Station {
             this.Vk = instruction.getImmediateOffset();
             this.Qk = "0";
         } else if ( instructionType == ITypes.BNEZ){
-            this.Qj = Tomasulo.getRegisterFile().getQ(instruction.getRd());
+            this.Qj = Tomasulo.getRegisterFile().getQ(instruction.getRs());
             if (this.Qj.equals("0"))
                 this.Vj = Tomasulo.getRegisterFile().getRegister(instruction.getRd());
             this.Vk = "0";
@@ -125,9 +129,10 @@ public class ReservationStation extends Station {
         Tomasulo.getRegisterFile().setRegisterValue(instruction.getRd(), instruction.execute(this));
         Tomasulo.getRegisterFile().setRegisterStatus(instruction.getRd(), "0");
 
-        if (instructionType == ITypes.BNEZ) {
+        if (instructionType == ITypes.BNEZ && Tomasulo.getRegisterFile().getRegister("B").equals("1")) {
             Tomasulo.getRegisterFile().setBFalse();
             Tomasulo.getInstructionCache().setPC(Integer.parseInt(instruction.getImmediateOffset()));
+//            System.err.println("||||||||Branching to instruction ("+ Tomasulo.getInstructionCache().getCurrentInstructionIndex()+")"  + Tomasulo.getInstructionCache().getCurrentInstruction().toString() + ":: at cycle " + Tomasulo.getCurrentCycle());
         }
     }
 }

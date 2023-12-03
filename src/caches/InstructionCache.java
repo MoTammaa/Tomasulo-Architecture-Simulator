@@ -20,7 +20,7 @@ public class InstructionCache extends Cache{
     }
 
     public int getCurrentCapacity() {
-        return Math.max(0,Math.min(lastInstruction,size-1));
+        return Math.max(0,Math.min(lastInstruction+1,size));
     }
 
     public int getCurrentInstructionIndex() {
@@ -40,6 +40,9 @@ public class InstructionCache extends Cache{
         if (PC <= lastInstruction) {
             if (Tomasulo.getRegisterFile().getRegister("B").equals("1")) return false;
             if (!Tomasulo.issueInstruction(this.instructions[PC])) return false;
+
+            System.out.println("||||||||Instruction " + getCurrentInstruction().toString() + ":: issued at cycle " + Tomasulo.getCurrentCycle());
+
             PC++;
             return true;
         } else {
