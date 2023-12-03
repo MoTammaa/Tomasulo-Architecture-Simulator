@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.HashMap;
 
 import caches.*;
 import instruction.*;
@@ -49,15 +50,11 @@ public class Tomasulo {
     private static int totalRegisters;
 
     private static Instruction[] instructions;
-    private static int totalInstructions;
-
-    private static int totalLoadStoreCycles;
-    private static int totalAddSubCycles;
-    private static int totalMulCycles;
-    private static int totalDivCycles;
 
     private static final int DEFAULT_CYCLES = 2;
     private static int currentCycle = 0;
+
+    private static HashMap<String, Integer> labels;
 
     public Tomasulo() {
         this.loadBuffers = new LoadStoreBuffer[MAX_LOAD_BUFFERS];
@@ -78,12 +75,9 @@ public class Tomasulo {
         }
         this.registerFile = new RegisterFile(); 
         this.instructions = new Instruction[MAX_INSTRUCTIONS];
-        this.totalLoadStoreCycles = DEFAULT_CYCLES;
-        this.totalAddSubCycles = DEFAULT_CYCLES;
-        this.totalMulCycles = DEFAULT_CYCLES;
-        this.totalDivCycles = DEFAULT_CYCLES;
         this.Icache = new InstructionCache(10);
         this.Dcache = new DataCache(500);
+        labels = new HashMap<String, Integer>();
     }
 
     // getters
@@ -108,6 +102,9 @@ public class Tomasulo {
     public static InstructionCache getInstructionCache() {
         return Icache;
     }
+    public static HashMap<String,Integer> getLabels() {
+        return labels;
+    }
 
 
 
@@ -116,7 +113,7 @@ public class Tomasulo {
             String line;
             int instructionIndex = 0;
             while ((line = reader.readLine()) != null) {
-                Instruction instruction = Instruction.parseInstruction(line);
+                Instruction instruction = Instruction.parseInstruction(line, Icache.getCurrentInstructionIndex() + 1);
                 if (instruction != null) {
                     instructions[instructionIndex] = instruction;
                     instructionIndex++;
@@ -124,10 +121,20 @@ public class Tomasulo {
                 }
             }
 //            System.out.println(".......\n"+Arrays.toString(addSubReservationStations));
-            totalInstructions = instructionIndex;
         } catch (IOException e) {
             System.err.println("Error reading from file: " + e.getMessage());
             e.printStackTrace();
+        }
+        // now loop on the BNEZ instructions to replace the labels by the hashmap values
+        for (Instruction inst: Icache.getInstructions()) {
+            if (inst == null) break;
+            if ( inst.getInstructionType() == ITypes.BNEZ) {
+                if(!labels.containsKey(inst.getImmediateOffset())) {
+                    System.err.println("WARNING! CANNOT FIND LABEL: '''''" + inst.getImmediateOffset() + "''''' in instruction: " + inst
+                            + "!! The code will initialize loop to first instruction and continue!!");
+                }
+                inst.setImmediateOffset(Integer.toString(labels.getOrDefault(inst.getImmediateOffset(), 0)));
+            }
         }
     }
     private static ReservationStation getFirstAvailableReservationStation(ReservationStation[] stations) {
@@ -480,8 +487,9 @@ public class Tomasulo {
         Tomasulo tomasulo = new Tomasulo();
         registerFile.setR(2,10);
         registerFile.setR(3,20);
+        registerFile.setR(12, -2);
         Tomasulo.loadDataFromFile("ins1.txt");
-        Tomasulo.simulate();
+//        Tomasulo.simulate();
 //        Tomasulo.printInstructions();
 //        Tomasulo.printStatus();
     }

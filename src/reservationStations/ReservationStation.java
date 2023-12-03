@@ -124,5 +124,10 @@ public class ReservationStation extends Station {
     public void writeBack() {
         Tomasulo.getRegisterFile().setRegisterValue(instruction.getRd(), instruction.execute(this));
         Tomasulo.getRegisterFile().setRegisterStatus(instruction.getRd(), "0");
+
+        if (instructionType == ITypes.BNEZ) {
+            Tomasulo.getRegisterFile().setBFalse();
+            Tomasulo.getInstructionCache().setPC(Integer.parseInt(instruction.getImmediateOffset()));
+        }
     }
 }

@@ -11,7 +11,13 @@ public class InstructionCache extends Cache{
         this.instructions = new Instruction[size];
         this.size = size;
     }
+    public void setPC(int PC) {
+        this.PC = PC;
+    }
 
+    public Instruction[] getInstructions() {
+        return instructions;
+    }
 
     public int getCurrentCapacity() {
         return Math.max(0,Math.min(lastInstruction,size-1));

@@ -4,6 +4,7 @@ import engine.Tomasulo;
 import reservationStations.ReservationStation;
 import reservationStations.Station;
 
+import java.util.Arrays;
 import java.util.InputMismatchException;
 
 public class Instruction {
@@ -106,8 +107,6 @@ public class Instruction {
         	String result;
         	switch (instructionType) {
             case ADD, ADDI:
-//                result = ( Rs.startsWith("R") ? Long.parseLong(((ReservationStation)station).getVj()) : Double.parseDouble(((ReservationStation)station).getVj()))
-//                            + ( Rt.startsWith("R") || instructionType.toString().endsWith("I") ? Long.parseLong(((ReservationStation)station).getVk()) : Double.parseDouble(((ReservationStation)station).getVk()));
                 if (instructionType.toString().endsWith("I")) {
                     result = Long.toString(Long.parseLong(((ReservationStation)station).getVj()) + Long.parseLong(((ReservationStation)station).getVk()));
                 } else {
@@ -116,8 +115,6 @@ public class Instruction {
                 }
                 break;
             case SUB, SUBI:
-//                result = ( Rs.startsWith("R") ? Long.parseLong(((ReservationStation)station).getVj()) : Double.parseDouble(((ReservationStation)station).getVj()))
-//                            - ( Rt.startsWith("R") || instructionType.toString().endsWith("I") ? Long.parseLong(((ReservationStation)station).getVk()) : Double.parseDouble(((ReservationStation)station).getVk())) + "";
                 if (instructionType.toString().endsWith("I")) {
                     result = Long.toString(Long.parseLong(((ReservationStation)station).getVj()) - Long.parseLong(((ReservationStation)station).getVk()));
                 } else {
@@ -126,8 +123,6 @@ public class Instruction {
                 }
                 break;
             case MUL, MULI:
-//                result = ( Rs.startsWith("R") ? Long.parseLong(((ReservationStation)station).getVj()) : Double.parseDouble(((ReservationStation)station).getVj()))
-//                            * ( Rt.startsWith("R") || instructionType.toString().endsWith("I") ? Long.parseLong(((ReservationStation)station).getVk()) : Double.parseDouble(((ReservationStation)station).getVk())) + "";
                 if (instructionType.toString().endsWith("I")) {
                     result = Long.toString(Long.parseLong(((ReservationStation)station).getVj()) * Long.parseLong(((ReservationStation)station).getVk()));
                 } else {
@@ -136,8 +131,6 @@ public class Instruction {
                 }
                 break;
             case DIV, DIVI:
-//                result = ( Rs.startsWith("R") ? Long.parseLong(((ReservationStation)station).getVj()) : Double.parseDouble(((ReservationStation)station).getVj()))
-//                            / ( Rt.startsWith("R") || instructionType.toString().endsWith("I") ? Long.parseLong(((ReservationStation)station).getVk()) : Double.parseDouble(((ReservationStation)station).getVk())) + "";
                 if (((ReservationStation)station).getVk().equals("0") || ((ReservationStation)station).getVk().equals("0.0")){
                     System.err.println("YOU CANNOT DIVIDE BY ZERO!! matet3ebneesh m3ak ya 7abibi");
                     ((ReservationStation)station).setVk("1");
@@ -166,8 +159,14 @@ public class Instruction {
     }
 
 
-    public static Instruction parseInstruction(String line) {
-        String[] parts = line.split("\\s*,\\s*|\\s*\\(\\s*|\\s*\\)\\s*|\\s+");
+    public static Instruction parseInstruction(String line, int instructionIdx){
+        String [] parts = line.split("\\s*:\\s*");
+        String label="";
+        if (parts.length > 1) {
+            label = parts[0];
+            line = parts[1];
+        }
+        parts = line.split("\\s*,\\s*|\\s*\\(\\s*|\\s*\\)\\s*|\\s+");
 
         if (parts.length >= 2) {
             String opcode = parts[0];
@@ -193,6 +192,18 @@ public class Instruction {
                 src1 = null;
             } else if (type == ITypes.ADDI || type == ITypes.SUBI || type == ITypes.MULI || type == ITypes.DIVI) {
                 immediate = parts[3];
+            } else if ( type == ITypes.BNEZ) {
+                src1 = parts[1];
+                src2 = null;
+                dest = "B";
+                immediate = parts[2];
+
+
+            }
+
+            if (!label.isEmpty()) {
+                // {label}: {instruction} {dest}, {src1}, {src2} ===> {label,instruction,dest src1, src2, ....}
+                Tomasulo.getLabels().put(label, instructionIdx);
             }
 
             Instruction instruction = new Instruction();
@@ -213,7 +224,8 @@ public class Instruction {
         return instructionType + " (Rd:" + Rd + "), (Rs:" + Rs + "),"+ (!instructionType.toString().endsWith("i")&&
                                                                         !instructionType.toString().endsWith("I") &&
                                                                         !instructionType.toString().startsWith("L") &&
-                                                                        !instructionType.toString().startsWith("S")?
+                                                                        !instructionType.toString().startsWith("S") &&
+                                                                        instructionType != ITypes.BNEZ?
                                                                             "  (Rt:" + Rt + ")" : " imm: " + immediateOffset);
     }
 
