@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.PriorityQueue;
 
 import caches.*;
 import instruction.*;
@@ -247,49 +248,82 @@ public class Tomasulo {
 
 
     public static void writeBack() {
+        PriorityQueue<Station> WBWaitingList = new PriorityQueue<>(Icache.getCurrentCapacity(), (s1, s2) -> {
+            if (s1.getInstruction().getInstructionStatus().getIssue() == null) return -1;
+            if (s2.getInstruction().getInstructionStatus().getIssue() == null) return 1;
+            return s1.getInstruction().getInstructionStatus().getIssue() - s2.getInstruction().getInstructionStatus().getIssue();
+        }); // sort the instructions according to their issue cycle
+
         // When an instruction finishes execution, in the next cycle, write back the result to the register file
-        startWriteBackInStations(addSubReservationStations);
+        startWriteBackInStations(addSubReservationStations, WBWaitingList);
 
-        startWriteBackInStations(mulDivReservationStations);
+        startWriteBackInStations(mulDivReservationStations, WBWaitingList);
 
-        startWriteBackInStations(loadBuffers);
+        startWriteBackInStations(loadBuffers, WBWaitingList);
 
-        startWriteBackInStations(storeBuffers);
+        startWriteBackInStations(storeBuffers, WBWaitingList);
+
+        // now choose the oldest highest priority instruction in the bus waiting list and write back its result
+        if (!WBWaitingList.isEmpty()) {
+            Station station = WBWaitingList.poll();
+            station.writeBack();
+            System.out.println("|| Instruction " + station.getInstruction() + " wrote back result at cycle " + getCurrentCycle());
+            station.release();
+        }
     }
 
-    private static void startWriteBackInStations(Station[] addSubReservationStations) {
+    private static void startWriteBackInStations(Station[] addSubReservationStations, PriorityQueue<Station> BusWaitingList) {
         for (Station station : addSubReservationStations) {
             if (station.isOccupied()) {
                 Instruction instruction = station.getInstruction();
                 if (instruction.getInstructionStatus().getExecutionComplete() != null && instruction.getInstructionStatus().getWriteBack() == null
                         && instruction.getInstructionStatus().getExecutionComplete() <= getCurrentCycle()-1) {
-                    // Write back the result to the register file
-                    station.writeBack();
-                    System.out.println("|| Instruction " + instruction + " wrote back result at cycle " + getCurrentCycle());
-                    station.release();
+                    // Write back the result to the register file or data memory, or add to the bus waiting list
+                    if (instruction.getInstructionType() == ITypes.STORE || instruction.getInstructionType() == ITypes.S_D) {
+                        station.writeBack();
+                        System.out.println("|| Instruction " + instruction + " wrote back result at cycle " + getCurrentCycle());
+                        station.release();
+                    } else {
+                        BusWaitingList.add(station);
+                    }
                 }
             }
         }
     }
 
     public static void broadcastResult() {
+        PriorityQueue<Station> BusWaitingList = new PriorityQueue<>(Icache.getCurrentCapacity()+1, (s1, s2) -> {
+            if (s1.getInstruction().getInstructionStatus().getIssue() == null) return -1;
+            if (s2.getInstruction().getInstructionStatus().getIssue() == null) return 1;
+            return s1.getInstruction().getInstructionStatus().getIssue() - s2.getInstruction().getInstructionStatus().getIssue();
+        }); // sort the instructions according to their issue cycle
+
+
         // When an instruction finishes execution, in the next cycle, broadcast the result to all reservation stations and load buffers
-        startBroadcastingInStations(addSubReservationStations);
+        startBroadcastingInStations(addSubReservationStations, BusWaitingList);
 
-        startBroadcastingInStations(mulDivReservationStations);
+        startBroadcastingInStations(mulDivReservationStations, BusWaitingList);
 
-        startBroadcastingInStations(loadBuffers);
+        startBroadcastingInStations(loadBuffers, BusWaitingList);
+
+        // now choose the oldest highest priority instruction in the bus waiting list and broadcast its result
+        if (!BusWaitingList.isEmpty()) {
+            Station station = BusWaitingList.poll();
+            station.broadcastResult();
+            System.out.println("|| Instruction " + station.getInstruction() + " broadcast result at cycle " + getCurrentCycle());
+        }
     }
 
-    private static void startBroadcastingInStations(Station[] addSubReservationStations) {
+    private static void startBroadcastingInStations(Station[] addSubReservationStations, PriorityQueue<Station> BusWaitingList) {
         for (Station station : addSubReservationStations) {
             if (station.isOccupied()) {
                 Instruction instruction = station.getInstruction();
                 if (instruction.getInstructionStatus().getExecutionComplete() != null &&
                         instruction.getInstructionStatus().getExecutionComplete() <= getCurrentCycle()-1) {
-                    // Broadcast the result to all reservation stations and load buffers
-                    station.broadcastResult();
-                    System.out.println("|| Instruction " + instruction + " broadcast result at cycle " + getCurrentCycle());
+                    // Broadcast the result to all reservation stations and store buffers
+                    if (instruction.getInstructionType() != ITypes.STORE && instruction.getInstructionType() != ITypes.S_D) {
+                        BusWaitingList.add(station);
+                    }
                 }
             }
         }
@@ -366,11 +400,14 @@ public class Tomasulo {
     
     public static void simulate() {
         while (!Icache.isFinished() || !isAllStationsEmpty()) {
+            System.out.println("\n--**--**--**--**--**--**--**--**--**--**--**--Your Events Summary for Today, umm- I mean for this cycle '"+ currentCycle+"' :)--**--**--**--**--**--**--**--**--**--**--**--**--**--**--**--\n");
+
             if(!Icache.isFinished() && !Icache.issueInstruction()) System.out.println("----------------Cannot Issue the current "+
-                                                Icache.getCurrentInstruction()+"  Instruction------------------------------");
+                                                Icache.getCurrentInstruction()+"  Instruction------------------------------\n");
             executeInstructions();
             broadcastResult();
             writeBack();
+            System.out.println("\n--**--**--**--**--**--**--**--**--**--**--**--**--**--**--**--End of your Events Summary--**--**--**--**--**--**--**--**--**--**--**--**--**--**--**--");
 
 
             printStatus();

@@ -21,34 +21,24 @@ public abstract class Station {
 
     public void broadcastResult() {
         String result = instruction.execute(this);
+        if (result == null) return;
 
-        for (ReservationStation reservationStation : Tomasulo.getAddSubReservationStations()) {
-            if (!reservationStation.isOccupied()) continue;
-
-            if (reservationStation.getQj().equals(name)) {
-                reservationStation.setQj("0");
-                reservationStation.setVj(result);
-            }
-            if (reservationStation.getQk().equals(name)) {
-                reservationStation.setQk("0");
-                reservationStation.setVk(result);
-            }
-        }
-
-        for (ReservationStation reservationStation : Tomasulo.getMulDivReservationStations()) {
-            if (!reservationStation.isOccupied()) continue;
-
-            if (reservationStation.getQj().equals(name)) {
-                reservationStation.setQj("0");
-                reservationStation.setVj(result);
-            }
-            if (reservationStation.getQk().equals(name)) {
-                reservationStation.setQk("0");
-                reservationStation.setVk(result);
+        for(ReservationStation[] reservationStations
+                : new ReservationStation[][]{Tomasulo.getMulDivReservationStations(), Tomasulo.getAddSubReservationStations()}) {
+            for (ReservationStation station : reservationStations) {
+                if (!station.isOccupied()) continue;
+                if (station.getQj().equals(name)) {
+                    station.setQj("0");
+                    station.setVj(result);
+                }
+                if (station.getQk().equals(name)) {
+                    station.setQk("0");
+                    station.setVk(result);
+                }
             }
         }
 
-        // now for the store buffers
+            // now for the store buffers
         for (LoadStoreBuffer sBuffer : Tomasulo.getStoreBuffers()) {
             if (!sBuffer.isOccupied()) continue;
             if (sBuffer.getQ().equals(name)) {
