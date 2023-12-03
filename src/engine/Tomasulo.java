@@ -488,7 +488,7 @@ public class Tomasulo {
         Tomasulo tomasulo = new Tomasulo();
         registerFile.setR(2,10);
         registerFile.setR(3,20);
-        registerFile.setR(12, -1);
+        registerFile.setR(12, -2);
         Tomasulo.loadDataFromFile("ins1.txt");
         Tomasulo.simulate();
 //        Tomasulo.printInstructions();

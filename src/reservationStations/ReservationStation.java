@@ -35,7 +35,7 @@ public class ReservationStation extends Station {
         } else if ( instructionType == ITypes.BNEZ){
             this.Qj = Tomasulo.getRegisterFile().getQ(instruction.getRs());
             if (this.Qj.equals("0"))
-                this.Vj = Tomasulo.getRegisterFile().getRegister(instruction.getRd());
+                this.Vj = Tomasulo.getRegisterFile().getRegister(instruction.getRs());
             this.Vk = "0";
             this.Qk = "0";
             Tomasulo.getRegisterFile().setBTrue();

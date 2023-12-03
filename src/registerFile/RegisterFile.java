@@ -128,12 +128,16 @@ public class RegisterFile {
     }
 
     public String getQ(String rs) {
-        if (rs.charAt(0) == 'R') {
-            return integerRegs[Integer.parseInt(rs.substring(1))].getRegisterStatus();
-        } else if (rs.charAt(0) == 'B') {
-            return branch.getRegisterStatus();
-        } else {
-            return floatingRegs[Integer.parseInt(rs.substring(1))].getRegisterStatus();
+        try {
+            if (rs.charAt(0) == 'R') {
+                return integerRegs[Integer.parseInt(rs.substring(1))].getRegisterStatus();
+            } else if (rs.charAt(0) == 'B') {
+                return branch.getRegisterStatus();
+            } else {
+                return floatingRegs[Integer.parseInt(rs.substring(1))].getRegisterStatus();
+            }
+        } catch (NumberFormatException e) {
+            throw new RuntimeException("Invalid Register Name: " + rs);
         }
     }
 
