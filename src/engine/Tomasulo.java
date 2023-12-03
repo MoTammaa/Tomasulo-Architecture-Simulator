@@ -12,59 +12,44 @@ import reservationStations.*;
 
 public class Tomasulo {
 
-    public static final int LOAD_CYCLES = 2;
-    public static final int STORE_CYCLES = 2;
-    public static final int ADD_CYCLES = 2;
-    public static final int SUB_CYCLES = 2;
-    public static final int MUL_CYCLES = 5;
-    public static final int DIV_CYCLES = 6;
-    public static final int BNEZ_CYCLES = 1;
-    public static final int ADDI_CYCLES = 1;
-
-
-
-    private static final int MAX_LOAD_BUFFERS = 2;
-    private static final int MAX_STORE_BUFFERS = 2;
-    private static final int MAX_ADD_STATIONS = 2;
-    private static final int MAX_MUL_DIV_STATIONS = 2;
-
-
-    private static final int MAX_INSTRUCTIONS = 100;
-    private static final int MAX_MEMORY = 500;
+    public static final int LOAD_CYCLES = 2, STORE_CYCLES = 2, ADD_CYCLES = 2, SUB_CYCLES = 2
+                            , MUL_CYCLES = 5, DIV_CYCLES = 6, BNEZ_CYCLES = 1, ADDI_CYCLES = 1;
+    private static final int MAX_LOAD_BUFFERS = 2, MAX_STORE_BUFFERS = 2
+                        , MAX_ADD_STATIONS = 2, MAX_MUL_DIV_STATIONS = 2;
+    private static final int MAX_INSTRUCTIONS = 100,         MAX_MEMORY = 500;
 
     private static final InstructionCache Icache;
     private static final DataCache Dcache;
-    
-    private static final LoadStoreBuffer[] loadBuffers;
 
-    private static final LoadStoreBuffer[] storeBuffers;
+    private static final LoadStoreBuffer[] loadBuffers,     storeBuffers;
+    private static final ReservationStation[] addSubReservationStations,    mulDivReservationStations;
 
-    private static final ReservationStation[] addSubReservationStations;
-
-    private static final ReservationStation[] mulDivReservationStations;
     private static final RegisterFile registerFile;
+    private static final HashMap<String, Integer> labels;
 
     private static int currentCycle = 0;
-
-    private static final HashMap<String, Integer> labels;
 
   static  {
         loadBuffers = new LoadStoreBuffer[MAX_LOAD_BUFFERS];
         for (int i = 0; i < loadBuffers.length; i++) {
             loadBuffers[i]= new LoadStoreBuffer("L" + (i+1));
         }
+
         storeBuffers = new LoadStoreBuffer[MAX_STORE_BUFFERS];
         for(int i = 0; i < storeBuffers.length; i++) {
             storeBuffers[i]= new LoadStoreBuffer("S" + (i+1));
         }
+
         addSubReservationStations = new ReservationStation[MAX_ADD_STATIONS];
         for(int i = 0; i < addSubReservationStations.length; i++) {
             addSubReservationStations[i]= new ReservationStation("A" + (i+1));
         }
+
         mulDivReservationStations = new ReservationStation[MAX_MUL_DIV_STATIONS];
         for(int i = 0; i < mulDivReservationStations.length; i++) {
             mulDivReservationStations[i]= new ReservationStation("M" + (i+1));
         }
+
         registerFile = new RegisterFile();
         Icache = new InstructionCache(MAX_INSTRUCTIONS);
         Dcache = new DataCache(MAX_MEMORY);
@@ -232,7 +217,6 @@ public class Tomasulo {
         return true;
     }
     public static void executeInstructions() {
-        // Implementation for executing instructions
         startExecutionInStation(addSubReservationStations);
 
         startExecutionInStation(mulDivReservationStations);
@@ -263,7 +247,6 @@ public class Tomasulo {
 
 
     public static void writeBack() {
-        // Implementation for writing back results
         // When an instruction finishes execution, in the next cycle, write back the result to the register file
         startWriteBackInStations(addSubReservationStations);
 
@@ -290,7 +273,6 @@ public class Tomasulo {
     }
 
     public static void broadcastResult() {
-        // Implementation for broadcasting results
         // When an instruction finishes execution, in the next cycle, broadcast the result to all reservation stations and load buffers
         startBroadcastingInStations(addSubReservationStations);
 
@@ -338,7 +320,6 @@ public class Tomasulo {
     }
 
     public static void printStatus() {
-        // Implementation for printing
         // Print the current cycle
         System.out.println("\n\n\n\n***********************************************************************Current Cycle: " + getCurrentCycle() +"****************************************************************************************");
         // Print the current state of the load buffers
@@ -384,7 +365,6 @@ public class Tomasulo {
 
     
     public static void simulate() {
-        // Implementation for simulation
         while (!Icache.isFinished() || !isAllStationsEmpty()) {
             if(!Icache.isFinished() && !Icache.issueInstruction()) System.out.println("----------------Cannot Issue the current "+
                                                 Icache.getCurrentInstruction()+"  Instruction------------------------------");
@@ -396,7 +376,7 @@ public class Tomasulo {
             printStatus();
 
             currentCycle++;
-            if (currentCycle > 20) {
+            if (currentCycle > 50) {
                 System.err.println("Simulation is taking too long. Terminating...");
                 break;
             }
