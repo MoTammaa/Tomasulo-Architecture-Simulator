@@ -1,6 +1,7 @@
 package caches;
 
 import engine.Tomasulo;
+import instruction.ITypes;
 import instruction.Instruction;
 
 public class InstructionCache extends Cache{
@@ -37,11 +38,11 @@ public class InstructionCache extends Cache{
         }
     }
     public boolean issueInstruction() {
-        if (PC <= lastInstruction) {
+        if (PC <= lastInstruction && instructions[PC].getInstructionType() != ITypes.HLT) {
             if (Tomasulo.getRegisterFile().getRegister("B").equals("1")) return false;
             if (!Tomasulo.issueInstruction(this.instructions[PC])) return false;
 
-            System.out.println("||||||||Instruction " + getCurrentInstruction().toString() + ":: issued at cycle " + Tomasulo.getCurrentCycle());
+            System.out.println("|||||||| Instruction " + getCurrentInstruction().toString() + ":: issued at cycle " + Tomasulo.getCurrentCycle());
 
             PC++;
             return true;
@@ -53,7 +54,7 @@ public class InstructionCache extends Cache{
         PC = 0;
     }
     public boolean isFinished() {
-        return PC > lastInstruction;
+        return PC > lastInstruction || instructions[PC].getInstructionType() == ITypes.HLT;
     }
 
     public Instruction M(int address) {

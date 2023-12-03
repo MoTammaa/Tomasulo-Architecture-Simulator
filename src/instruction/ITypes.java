@@ -13,7 +13,9 @@ public enum ITypes {
     STORE("STORE"),     // STORE R1, 100(R0)   or    STORE R3, 200
     BNEZ("BNEZ"),       // BNEZ R1, 100     or    BNEZ F1, 100   // NOT SURE IF 2nd PARAMETER IS OFFSET OR LABEL
     L_D("L.D"),         // L.D F1, 100(R2) or    L.D F1, 300
-    S_D("S.D");         // S.D F1, 100(R2) or    S.D F1, 300
+    S_D("S.D"),         // S.D F1, 100(R2) or    S.D F1, 300
+    HLT("HLT");         // HALT
+
 
     private final String instructionType;
 
@@ -27,7 +29,8 @@ public enum ITypes {
 
     public static ITypes getInstructionType(String instructionType) {
         for (ITypes iType : ITypes.values()) {
-            if (iType.getInstructionType().equalsIgnoreCase(instructionType)) {
+            if (iType.getInstructionType().equalsIgnoreCase(instructionType) ||
+                    instructionType.equalsIgnoreCase("D" + iType.getInstructionType())) {
                 return iType;
             } else if (instructionType.equalsIgnoreCase("MULTI")) {
                 return MULI;

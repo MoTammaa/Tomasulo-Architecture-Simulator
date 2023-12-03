@@ -187,16 +187,24 @@ public class Instruction {
 
 
     public static Instruction parseInstruction(String line, int instructionIdx){
+        boolean hasLabel = line.contains(":");
         String [] parts = line.split("\\s*:\\s*");
         String label="";
-        if (parts.length > 1) {
+        if (hasLabel) {
             label = parts[0];
-            line = parts[1];
+            if (parts.length > 1) line = parts[1];
+            if (line.split("\\s*:\\s*").length > 1) {
+                throw new InputMismatchException("Invalid label format: " + line);
+            }
         }
-//        System.out.println("line: " + line);
-        parts = line.split("\\s*,\\s*|\\s*\\(\\s*|\\s*\\)\\s*|\\s+");
 
-        if (parts.length >= 2) {
+        if (line.split("\\s*,\\s*").length < 2) {
+            if (hasLabel) System.err.println("Invalid label format: " + line + " (missing instruction), so inserting HALT instruction");
+            line = "HLT, exit(0)";
+        }
+
+        parts = line.split("\\s*,\\s*|\\s*\\(\\s*|\\s*\\)\\s*|\\s+");
+        if (parts.length >= 2 ) {
             String opcode = parts[0];
             ITypes type = ITypes.getInstructionType(opcode);
             if (type == null) {
