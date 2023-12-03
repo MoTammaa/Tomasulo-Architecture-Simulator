@@ -8,7 +8,7 @@ public class LoadStoreBuffer extends Station{
     private boolean isOccupied=false;
     private String address;
     private String fu;
-    private String Q;
+    private String Q, V;
 
     public LoadStoreBuffer(String bufferName) {
         this.bufferName = this.name = bufferName;
@@ -27,7 +27,7 @@ public class LoadStoreBuffer extends Station{
         if (bufferName.startsWith("L")) { // Load: read from memory
             this.Q = "0";
             this.address = instruction.getImmediateOffset(); // assuming    L.D R1, 100
-            this.fu = instruction.getRd();
+//            this.fu = instruction.getRd();
         } else { // Store: read from register file
             this.Q = Tomasulo.getRegisterFile().getQ(instruction.getRd());
             if (this.Q.equals("0"))
@@ -79,7 +79,7 @@ public class LoadStoreBuffer extends Station{
         return  bufferName + "{" +
                 "Busy=" + (isOccupied?1:0) +
                 ", address='" + address + '\'' +
-                ", "+(bufferName.startsWith("L") ? "Dest='" : "Src='") + fu + '\'' +
+                ", "+(bufferName.startsWith("L") ? "" : "Src='" + fu) + '\'' +
                 ", Q='" + Q + '\'' +
                 ", instruction=" + instruction +
                 '}';
@@ -91,7 +91,7 @@ public class LoadStoreBuffer extends Station{
             Tomasulo.getRegisterFile().setRegisterValue(instruction.getRd(), instruction.execute(this));
             Tomasulo.getRegisterFile().setRegisterStatus(instruction.getRd(), "0");
         } else { // Store: write to memory
-            Tomasulo.getDataCache().setM(address, instruction.execute(this));
+            Tomasulo.getDataCache().setM(address, fu);
         }
     }
 }
