@@ -13,7 +13,9 @@ public enum ITypes {
     STORE("STORE"),     // STORE R1, 100(R0)   or    STORE R3, 200
     BNEZ("BNEZ"),       // BNEZ R1, 100     or    BNEZ F1, 100   // NOT SURE IF 2nd PARAMETER IS OFFSET OR LABEL
     L_D("L.D"),         // L.D F1, 100(R2) or    L.D F1, 300
-    S_D("S.D");         // S.D F1, 100(R2) or    S.D F1, 300
+    S_D("S.D"),         // S.D F1, 100(R2) or    S.D F1, 300
+    HLT("HLT");         // HALT
+
 
     private final String instructionType;
 
