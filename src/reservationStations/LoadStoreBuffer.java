@@ -86,6 +86,7 @@ public class LoadStoreBuffer extends Station{
     }
 
     public void writeBack() {
+        instruction.setWriteBack(Tomasulo.getCurrentCycle());
         if (bufferName.startsWith("L")) { // Load: write to register file
             Tomasulo.getRegisterFile().setRegisterValue(instruction.getRd(), instruction.execute(this));
             Tomasulo.getRegisterFile().setRegisterStatus(instruction.getRd(), "0");

@@ -302,7 +302,7 @@ public class Tomasulo {
                         && instruction.getInstructionStatus().getExecutionComplete() <= getCurrentCycle()-1) {
                     // Write back the result to the register file
                     station.writeBack();
-                    System.out.println("Instruction " + instruction.toString() + " wrote back result at cycle " + getCurrentCycle());
+                    System.out.println("|| Instruction " + instruction.toString() + " wrote back result at cycle " + getCurrentCycle());
                     station.release();
                 }
             }
