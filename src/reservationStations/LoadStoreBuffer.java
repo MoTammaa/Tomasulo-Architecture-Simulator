@@ -8,7 +8,7 @@ public class LoadStoreBuffer extends Station{
     private boolean isOccupied=false;
     private String address;
     private String fu;
-    private String Q, V;
+    private String Q;
 
     public LoadStoreBuffer(String bufferName) {
         this.bufferName = this.name = bufferName;
