@@ -6,6 +6,9 @@ public class DataCache extends Cache{
     public DataCache(int size) {
         this.size = size;
         this.data = new String[size];
+        for (int i = 0; i < size; i++) {
+            data[i] = "0";
+        }
     }
 
     @Override

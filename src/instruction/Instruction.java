@@ -1,6 +1,7 @@
 package instruction;
 
 import engine.Tomasulo;
+import reservationStations.LoadStoreBuffer;
 import reservationStations.ReservationStation;
 import reservationStations.Station;
 
@@ -168,8 +169,8 @@ public class Instruction {
                             Double.toString(Double.parseDouble(((ReservationStation)station).getVj()) / Double.parseDouble(((ReservationStation)station).getVk()));
                 }
                 break;
-            case LOAD, L_D:
-                result = Rs;
+            case LOAD, L_D: //M[]
+                result = Tomasulo.getDataCache().M(Integer.parseInt(((LoadStoreBuffer)station).getInstruction().getImmediateOffset()));
                 break;
             case STORE, S_D:
                 result = null;

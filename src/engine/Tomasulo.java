@@ -222,15 +222,15 @@ public class Tomasulo {
 
         startExecutionInStation(mulDivReservationStations);
 
-        startExecutionInStation(loadBuffers);
+        startExecutionInBuffer(loadBuffers);
 
-        startExecutionInStation(storeBuffers);
+        startExecutionInBuffer(storeBuffers);
 
 
     }
 
-    private static void startExecutionInStation(Station[] addSubReservationStations) {
-        for (Station station : addSubReservationStations) {
+    private static void startExecutionInStation(Station[] Stations) {
+        for (Station station : Stations) {
             if (station.isOccupied()) {
                 Instruction instruction = station.getInstruction();
                 if (instruction.getInstructionStatus().getIssue() != null && instruction.getInstructionStatus().getExecutionStart() == null ) {
@@ -241,6 +241,19 @@ public class Tomasulo {
                         System.out.println("|||| Instruction " + instruction + " started execution at cycle " + getCurrentCycle());
                     }
 //                  else System.out.println("Instruction " + instruction.toString() + " is not ready to start execution at cycle " + getCurrentCycle());
+                }
+            }
+        }
+    }
+
+    private static void startExecutionInBuffer(LoadStoreBuffer[] buffers) {
+        for (LoadStoreBuffer lsBuffer : buffers) {
+            if (lsBuffer.isOccupied()) {
+                Instruction instruction = lsBuffer.getInstruction();
+                if (instruction.getInstructionStatus().getIssue() != null && instruction.getInstructionStatus().getExecutionStart() == null
+                        && instruction.getInstructionStatus().getIssue() <= getCurrentCycle() - 1)  {
+                    instruction.startExecution(getCurrentCycle());
+                    System.out.println("|||| Instruction " + instruction.toString() + " started execution at cycle " + getCurrentCycle());
                 }
             }
         }
@@ -430,6 +443,7 @@ public class Tomasulo {
         registerFile.setR(12, -2);
 
         Tomasulo.simulate();
+        System.out.println(Dcache);
 
 //        Tomasulo.printInstructions();//        Tomasulo.printStatus();
     }
