@@ -253,7 +253,7 @@ public class Tomasulo {
                 if (instruction.getInstructionStatus().getIssue() != null && instruction.getInstructionStatus().getExecutionStart() == null
                         && instruction.getInstructionStatus().getIssue() <= getCurrentCycle() - 1)  {
                     instruction.startExecution(getCurrentCycle());
-                    System.out.println("|||| Instruction " + instruction.toString() + " started execution at cycle " + getCurrentCycle());
+                    System.out.println("|||| Instruction " + instruction + " started execution at cycle " + getCurrentCycle());
                 }
             }
         }
