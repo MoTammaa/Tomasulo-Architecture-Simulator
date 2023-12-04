@@ -443,7 +443,8 @@ public class Tomasulo {
 //STORE F1, 100
         registerFile.setF(1,1.1);
         registerFile.setF(3,2.4);
-        registerFile.setR(12, -2);
+        registerFile.setR(2, -2);
+        registerFile.setR(9, 6);
         Dcache.setM(100, "3.1");
 
         Tomasulo.simulate();
