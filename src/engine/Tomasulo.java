@@ -250,7 +250,7 @@ public class Tomasulo {
         for (LoadStoreBuffer lsBuffer : buffers) {
             if (lsBuffer.isOccupied()) {
                 Instruction instruction = lsBuffer.getInstruction();
-                if (instruction.getInstructionStatus().getIssue() != null && instruction.getInstructionStatus().getExecutionStart() == null
+                if (lsBuffer.isReady() && instruction.getInstructionStatus().getIssue() != null && instruction.getInstructionStatus().getExecutionStart() == null
                         && instruction.getInstructionStatus().getIssue() <= getCurrentCycle() - 1)  {
                     instruction.startExecution(getCurrentCycle());
                     System.out.println("|||| Instruction " + instruction + " started execution at cycle " + getCurrentCycle());
@@ -437,13 +437,17 @@ public class Tomasulo {
 
     public static void main(String[] args) {
         System.out.println("Hello World!");
-
-        registerFile.setR(2,10);
-        registerFile.setR(3,20);
+//ADD F1, F1, F3    = 1.1 + 2.4 = 3.5
+//LOAD F4, 100      = 3.5
+//ADD F1, F1, F4    = 3.5 + 3.5 = 7
+//STORE F1, 100
+        registerFile.setF(1,1.1);
+        registerFile.setF(3,2.4);
         registerFile.setR(12, -2);
+        Dcache.setM(100, "3.1");
 
         Tomasulo.simulate();
-        System.out.println(Dcache);
+//        System.out.println(Dcache);
 
 //        Tomasulo.printInstructions();//        Tomasulo.printStatus();
     }

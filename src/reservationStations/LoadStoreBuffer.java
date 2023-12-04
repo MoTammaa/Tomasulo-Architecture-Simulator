@@ -1,6 +1,7 @@
 package reservationStations;
 
 import engine.Tomasulo;
+import instruction.ITypes;
 import instruction.Instruction;
 
 public class LoadStoreBuffer extends Station{
@@ -27,6 +28,7 @@ public class LoadStoreBuffer extends Station{
         if (bufferName.startsWith("L")) { // Load: read from memory
             this.Q = "0";
             this.address = instruction.getImmediateOffset(); // assuming    L.D R1, 100
+            Tomasulo.getRegisterFile().setRegisterStatus(instruction.getRd(), bufferName);
 //            this.fu = instruction.getRd();
         } else { // Store: read from register file
             this.Q = Tomasulo.getRegisterFile().getQ(instruction.getRd());
@@ -41,7 +43,7 @@ public class LoadStoreBuffer extends Station{
     }
 
     public boolean isReady() {
-        return isOccupied && fu != null && address != null && Q.equals("0");
+        return isOccupied && (fu != null || instruction.getInstructionType() == ITypes.LOAD) && address != null && Q.equals("0");
     }
 
     public void occupy() {
