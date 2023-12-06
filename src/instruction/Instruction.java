@@ -187,6 +187,7 @@ public class Instruction {
 
 
     public static Instruction parseInstruction(String line, int instructionIdx){
+        if (line.startsWith("//")) return null;
         boolean hasLabel = line.contains(":");
         String [] parts = line.split("\\s*:\\s*");
         String label="";
@@ -203,7 +204,7 @@ public class Instruction {
             line = "HLT, exit(0)";
         }
 
-        parts = line.split("\\s*,\\s*|\\s*\\(\\s*|\\s*\\)\\s*|\\s+");
+        parts = line.split("\\s*,\\s*|\\s*\\(\\s*|\\s*\\)\\s*|\\s*//|\\s+");
         if (parts.length >= 2 ) {
             String opcode = parts[0];
             ITypes type = ITypes.getInstructionType(opcode);

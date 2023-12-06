@@ -81,7 +81,8 @@ public class LoadStoreBuffer extends Station{
         return  bufferName + "{" +
                 "Busy=" + (isOccupied?1:0) +
                 ", address='" + address + '\'' +
-                ", "+(bufferName.startsWith("L") ? "" : "V='" + fu) + '\'' +
+                ", "  + (bufferName.startsWith("S") ? "Src" : "Dest") + "='" + (instruction == null ? "null" : instruction.getRd()) + '\'' +
+                (bufferName.startsWith("L") ? "" : ", V='" + fu + '\'') +
                 ", Q='" + Q + '\'' +
                 ", instruction=" + instruction +
                 '}';

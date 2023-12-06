@@ -108,6 +108,13 @@ public class Tomasulo {
                 inst.setImmediateOffset(Integer.toString(labels.getOrDefault(inst.getImmediateOffset(), 0)));
             }
         }
+        if (Icache.getInstructions()[0] == null) {
+            System.err.println("ERROR! NO INSTRUCTIONS FOUND!!");
+            System.exit(1);
+        }
+        if (Icache.getInstructions()[Icache.getCurrentCapacity()-1].getInstructionType() != ITypes.HLT) {
+            Icache.addInstruction(new Instruction(ITypes.HLT, "exit", "0", null));
+        }
     }
     private static ReservationStation getFirstAvailableReservationStation(ReservationStation[] stations) {
         for (ReservationStation station : stations) {
