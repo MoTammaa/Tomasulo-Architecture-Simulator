@@ -1,7 +1,8 @@
 package caches;
 
 public class DataCache extends Cache{
-    private String[] data;
+    private final String[] data;
+    private final boolean DISPLAY_EMPTY_BLOCKS = false;
 
     public DataCache(int size) {
         this.size = size;
@@ -34,6 +35,7 @@ public class DataCache extends Cache{
         StringBuilder sb = new StringBuilder();
         sb.append("Data Cache:\n");
         for (int i = 0; i < size; i++) {
+            if (!DISPLAY_EMPTY_BLOCKS && data[i].equals("0")) continue;
             sb.append("@").append(i).append(": ").append(data[i]).append("\n");
         }
         return sb.toString();

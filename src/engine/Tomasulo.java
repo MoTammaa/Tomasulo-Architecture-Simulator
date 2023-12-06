@@ -30,6 +30,20 @@ public class Tomasulo {
 
     private static int currentCycle = 0;
 
+    public static void main(String[] args) {
+        System.out.println("Hello World!");
+//ADD F1, F1, F3    = 1.1 + 2.4 = 3.5
+//LOAD F4, 100      = 3.5
+//ADD F1, F1, F4    = 3.5 + 3.5 = 7
+//STORE F1, 100
+        registerFile.setF(1,1.1);
+        registerFile.setF(3,2.4);
+        registerFile.setR(2, -2);
+        registerFile.setR(9, 6);
+        Dcache.setM(100, "3.1");
+
+        Tomasulo.simulate();
+    }
   static  {
         loadBuffers = new LoadStoreBuffer[MAX_LOAD_BUFFERS];
         for (int i = 0; i < loadBuffers.length; i++) {
@@ -409,6 +423,9 @@ public class Tomasulo {
         System.out.println("Instructions: ");
         System.out.println(Icache);
         System.out.println("-----------------------");
+        System.out.println("Data Memory (Only non-zero values are displayed):");
+        System.out.println(Dcache);
+        System.out.println("-----------------------");
 
         System.out.println("**********************************************************************************************************************************************************\n\n\n\n");
 
@@ -441,24 +458,6 @@ public class Tomasulo {
         }
 
         System.out.println("===========================Total Cycles: " + (getCurrentCycle()-1));
-    }
-
-    public static void main(String[] args) {
-        System.out.println("Hello World!");
-//ADD F1, F1, F3    = 1.1 + 2.4 = 3.5
-//LOAD F4, 100      = 3.5
-//ADD F1, F1, F4    = 3.5 + 3.5 = 7
-//STORE F1, 100
-        registerFile.setF(1,1.1);
-        registerFile.setF(3,2.4);
-        registerFile.setR(2, -2);
-        registerFile.setR(9, 6);
-        Dcache.setM(100, "3.1");
-
-        Tomasulo.simulate();
-//        System.out.println(Dcache);
-
-//        Tomasulo.printInstructions();//        Tomasulo.printStatus();
     }
 
 }
