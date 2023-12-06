@@ -147,9 +147,9 @@ public class Tomasulo {
         return getFirstAvailableStoreBuffer();
     }
     private static LoadStoreBuffer getAvailableLoadStoreBuffer(Instruction instruction) {
-        if (instruction.getInstructionType() == ITypes.LOAD ) {
+        if (instruction.getInstructionType() == ITypes.LOAD || instruction.getInstructionType() == ITypes.L_D) {
             return getAvailableLoadBuffer();
-        } else if (instruction.getInstructionType() == ITypes.STORE) {
+        } else if (instruction.getInstructionType() == ITypes.STORE || instruction.getInstructionType() == ITypes.S_D) {
             return getAvailableStoreBuffer();
         }
 
@@ -164,7 +164,8 @@ public class Tomasulo {
     }
     public static boolean issueInstruction(Instruction instruction) {
         // Determine the type of instruction and handle accordingly
-        if (instruction.getInstructionType() == ITypes.LOAD || instruction.getInstructionType() == ITypes.STORE) {
+        if (instruction.getInstructionType() == ITypes.LOAD || instruction.getInstructionType() == ITypes.STORE
+                || instruction.getInstructionType() == ITypes.L_D || instruction.getInstructionType() == ITypes.S_D) {
             return issueLoadStoreInstruction(instruction);
         } else if (instruction.getInstructionType() == ITypes.ADD ||
                     instruction.getInstructionType() == ITypes.SUB ||

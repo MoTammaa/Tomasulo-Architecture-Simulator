@@ -43,7 +43,7 @@ public class LoadStoreBuffer extends Station{
     }
 
     public boolean isReady() {
-        return isOccupied && (fu != null || instruction.getInstructionType() == ITypes.LOAD) && address != null && Q.equals("0");
+        return isOccupied && (fu != null || instruction.getInstructionType() == ITypes.LOAD || instruction.getInstructionType() == ITypes.L_D) && address != null && Q.equals("0");
     }
 
     public void occupy() {
