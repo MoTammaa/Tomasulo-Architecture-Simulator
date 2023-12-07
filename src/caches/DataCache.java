@@ -1,5 +1,8 @@
 package caches;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class DataCache extends Cache{
     private final String[] data;
     private final boolean DISPLAY_EMPTY_BLOCKS = false;
@@ -39,5 +42,14 @@ public class DataCache extends Cache{
             sb.append("@").append(i).append(": ").append(data[i]).append("\n");
         }
         return sb.toString();
+    }
+@Override
+    public String[][] getTableData() {
+        List<String[]> ret = new ArrayList<>();
+        for (int i = 0; i < size; i++) {
+            if (!DISPLAY_EMPTY_BLOCKS && data[i].equals("0")) continue;
+            ret.add(new String[]{String.valueOf(i), data[i]});
+        }
+        return ret.toArray(new String[0][0]);
     }
 }

@@ -6,6 +6,7 @@ import instruction.Instruction;
 public abstract class Station {
     String name;
     Instruction instruction;
+    boolean isOccupied=false;
 
     public Instruction getInstruction() {
         return instruction;
@@ -45,6 +46,14 @@ public abstract class Station {
                 sBuffer.setQ("0");
                 sBuffer.setFu(result);
             }
+        }
+    }
+
+    public String[] getTableData() {
+        if (this instanceof LoadStoreBuffer) { // {"Index", "Busy", "Address", "V", "Q", "Dest/Src"};
+            return new String[]{name, String.valueOf(isOccupied), ((LoadStoreBuffer) this).getAddress(), ((LoadStoreBuffer) this).getFu(), ((LoadStoreBuffer) this).getQ(), (instruction == null ? null : instruction.getRd())};
+        } else { //{"Index", "Busy", "Op", "Vj", "Vk", "Qj", "Qk"};
+            return new String[]{name, String.valueOf(isOccupied), instruction == null? null :instruction.getInstructionType().toString(), ((ReservationStation) this).getVj(), ((ReservationStation) this).getVk(), ((ReservationStation) this).getQj(), ((ReservationStation) this).getQk()};
         }
     }
 }

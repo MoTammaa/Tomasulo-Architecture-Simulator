@@ -5,6 +5,7 @@ public abstract class Cache {
 
     public abstract Object M(int address);
     public abstract Object M(String address);
+    public abstract String[][] getTableData();
 
 
     public int getMaxSize() {

@@ -6,7 +6,6 @@ import instruction.Instruction;
 
 public class LoadStoreBuffer extends Station{
     private final String bufferName;
-    private boolean isOccupied=false;
     private String address;
     private String fu;
     private String Q;

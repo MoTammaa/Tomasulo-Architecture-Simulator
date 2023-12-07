@@ -6,7 +6,6 @@ import instruction.Instruction;
 
 public class ReservationStation extends Station {
     private final String reservationStationName;
-    private boolean isOccupied=false;
     private ITypes instructionType;
     private String Vj;
     private String Vk;

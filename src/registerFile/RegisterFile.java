@@ -144,4 +144,17 @@ public class RegisterFile {
     public boolean isThereBranchIssued() {
         return branch.isReady();
     }
+
+    public String[][][] getTableData() {
+        String[][][] data = new String[2][32][3];
+        for (int i = 0; i < 32; i++) {
+            data[1][i][0] = "R" + i;
+            data[1][i][1] = integerRegs[i].getRegisterStatus();
+            data[1][i][2] = integerRegs[i].getValue();
+            data[0][i][0] = "F" + i;
+            data[0][i][1] = floatingRegs[i].getRegisterStatus();
+            data[0][i][2] = floatingRegs[i].getValue();
+        }
+        return data;
+    }
 }

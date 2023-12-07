@@ -86,4 +86,14 @@ public class InstructionCache extends Cache{
 
         return sb.toString();
     }
+
+    @Override
+    public String[][] getTableData() {
+        String[][] data = new String[size][2];
+        for (int i = 0; i < size; i++) {
+            data[i][0] = String.valueOf(i);
+            data[i][1] = instructions[i] == null ? null : instructions[i].toString();
+        }
+        return data;
+    }
 }

@@ -1,21 +1,25 @@
 package engine;
 
+import java.awt.*;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.PriorityQueue;
 
 import caches.*;
 import instruction.*;
 import registerFile.*;
 import reservationStations.*;
+import view.Tables;
 
 public class Tomasulo {
 
     public static final int LOAD_CYCLES = 2, STORE_CYCLES = 2, ADD_CYCLES = 2, SUB_CYCLES = 2
                             , MUL_CYCLES = 5, DIV_CYCLES = 6, BNEZ_CYCLES = 1, ADDI_CYCLES = 1;
-    private static final int MAX_LOAD_BUFFERS = 2, MAX_STORE_BUFFERS = 2
+    public static final int MAX_LOAD_BUFFERS = 2, MAX_STORE_BUFFERS = 2
                         , MAX_ADD_STATIONS = 2, MAX_MUL_DIV_STATIONS = 2;
     private static final int MAX_INSTRUCTIONS = 100,         MAX_MEMORY = 500;
 
@@ -389,43 +393,69 @@ public class Tomasulo {
     }
 
     public static void printStatus() {
+        List<String[]> data = new ArrayList<>();
+
         // Print the current cycle
         System.out.println("\n\n\n\n***********************************************************************Current Cycle: " + getCurrentCycle() +"****************************************************************************************");
         // Print the current state of the load buffers
         System.out.println("Load Buffers: ");
         for (LoadStoreBuffer loadBuffer : loadBuffers) {
             System.out.println(loadBuffer);
+            data.add(loadBuffer.getTableData());
         }
+        Tables.addToTablesBuffer(data.toArray(new String[0][]), Tables.TableType.LOAD_BUFFER, getCurrentCycle());
+        data.clear();
+
         System.out.println("-----------------------");
         // Print the current state of the store buffers
         System.out.println("Store Buffers: ");
         for (LoadStoreBuffer storeBuffer : storeBuffers) {
             System.out.println(storeBuffer);
+            data.add(storeBuffer.getTableData());
         }
+        Tables.addToTablesBuffer(data.toArray(new String[0][]), Tables.TableType.STORE_BUFFER, getCurrentCycle());
+        data.clear();
+
         System.out.println("-----------------------");
         // Print the current state of the add/sub reservation stations
         System.out.println("Add/Sub Reservation Stations: ");
         for (ReservationStation addSubReservationStation : addSubReservationStations) {
             System.out.println(addSubReservationStation);
+            data.add(addSubReservationStation.getTableData());
         }
+        Tables.addToTablesBuffer(data.toArray(new String[0][]), Tables.TableType.ADD_SUB_STATIONS, getCurrentCycle());
+        data.clear();
+
         System.out.println("-----------------------");
         // Print the current state of the multiply/divide reservation stations
         System.out.println("Mul/Div Reservation Stations: ");
         for (ReservationStation mulDivReservationStation : mulDivReservationStations) {
             System.out.println(mulDivReservationStation);
+            data.add(mulDivReservationStation.getTableData());
         }
+        Tables.addToTablesBuffer(data.toArray(new String[0][]), Tables.TableType.MUL_DIV_STATIONS, getCurrentCycle());
+        data.clear();
+
         System.out.println("-----------------------");
         // Print the current state of the register file
         System.out.println("Register File: ");
         System.out.println(registerFile);
         System.out.println("-----------------------");
+
+        String [][][] registerFileData = registerFile.getTableData();
+        Tables.addToTablesBuffer(registerFileData[0], Tables.TableType.REGISTER_FILE, getCurrentCycle());
+        Tables.addToTablesBuffer(registerFileData[1], Tables.TableType.REGISTER_FILE, getCurrentCycle());
+
         // Print the current state of the instructions
         System.out.println("Instructions: ");
         System.out.println(Icache);
         System.out.println("-----------------------");
+        Tables.addToTablesBuffer(Icache.getTableData(), Tables.TableType.INSTRUCTION_CACHE, getCurrentCycle());
+
         System.out.println("Data Memory (Only non-zero values are displayed):");
         System.out.println(Dcache);
         System.out.println("-----------------------");
+        Tables.addToTablesBuffer(Dcache.getTableData(), Tables.TableType.DATA_CACHE, getCurrentCycle());
 
         System.out.println("**********************************************************************************************************************************************************\n\n\n\n");
 
@@ -458,6 +488,7 @@ public class Tomasulo {
         }
 
         System.out.println("===========================Total Cycles: " + (getCurrentCycle()-1));
+        Tables.displayAllTables();
     }
 
 }
