@@ -53,8 +53,6 @@ public class Tables {
         // Create a JPanel with BoxLayout
         panel.removeAll();
 
-
-
         JPanel status = new JPanel();
         JLabel label = new JLabel("Cycle " + currentCycleDisplayed + "/" + (cyclesTables.size() - 1));
         label.setFont(new Font("Arial", Font.BOLD, 24));

@@ -1,6 +1,4 @@
 package engine;
-
-import java.awt.*;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
@@ -14,41 +12,33 @@ import instruction.*;
 import registerFile.*;
 import reservationStations.*;
 import view.Tables;
+import view.TomasuloInputs;
 
 public class Tomasulo {
 
-    public static final int LOAD_CYCLES = 2, STORE_CYCLES = 2, ADD_CYCLES = 2, SUB_CYCLES = 2
-                            , MUL_CYCLES = 5, DIV_CYCLES = 6, BNEZ_CYCLES = 1, ADDI_CYCLES = 1;
-    public static final int MAX_LOAD_BUFFERS = 2, MAX_STORE_BUFFERS = 2
-                        , MAX_ADD_STATIONS = 2, MAX_MUL_DIV_STATIONS = 2;
-    private static final int MAX_INSTRUCTIONS = 100,         MAX_MEMORY = 500;
+    public static int LOAD_CYCLES, STORE_CYCLES, ADD_CYCLES, SUB_CYCLES
+                            , MUL_CYCLES, DIV_CYCLES, BNEZ_CYCLES, ADDI_CYCLES = 1;
+    public static int MAX_LOAD_BUFFERS, MAX_STORE_BUFFERS
+                        , MAX_ADD_STATIONS, MAX_MUL_DIV_STATIONS ;
+    private static final int MAX_INSTRUCTIONS = 100, MAX_MEMORY = 500;
 
-    private static final InstructionCache Icache;
-    private static final DataCache Dcache;
 
-    private static final LoadStoreBuffer[] loadBuffers,     storeBuffers;
-    private static final ReservationStation[] addSubReservationStations,    mulDivReservationStations;
+    private static String instructionFilePath;
+    private static InstructionCache Icache;
+    private static DataCache Dcache;
 
-    private static final RegisterFile registerFile;
-    private static final HashMap<String, Integer> labels;
+    private static LoadStoreBuffer[] loadBuffers,     storeBuffers;
+    private static ReservationStation[] addSubReservationStations,    mulDivReservationStations;
+
+    private static RegisterFile registerFile;
+    private static HashMap<String, Integer> labels;
 
     private static int currentCycle = 0;
 
     public static void main(String[] args) {
-        System.out.println("Hello World!");
-//ADD F1, F1, F3    = 1.1 + 2.4 = 3.5
-//LOAD F4, 100      = 3.5
-//ADD F1, F1, F4    = 3.5 + 3.5 = 7
-//STORE F1, 100
-        registerFile.setF(1,1.1);
-        registerFile.setF(3,2.4);
-        registerFile.setR(2, -2);
-        registerFile.setR(9, 6);
-        Dcache.setM(100, "3.1");
-
-        Tomasulo.simulate();
+        TomasuloInputs.processTomasuloInputs();
     }
-  static  {
+  public static void initializeTomasulo()  {
         loadBuffers = new LoadStoreBuffer[MAX_LOAD_BUFFERS];
         for (int i = 0; i < loadBuffers.length; i++) {
             loadBuffers[i]= new LoadStoreBuffer("L" + (i+1));
@@ -73,10 +63,57 @@ public class Tomasulo {
         Icache = new InstructionCache(MAX_INSTRUCTIONS);
         Dcache = new DataCache(MAX_MEMORY);
         labels = new HashMap<>();
-        Tomasulo.loadDataFromFile("ins1.txt");
+        Tomasulo.loadDataFromFile(instructionFilePath + ".txt");
     }
 
     // getters and setters
+
+    public void setAddCycles(int cycles) {
+        ADD_CYCLES = cycles;
+    }
+
+    public void setSubCycles(int cycles) {
+        SUB_CYCLES = cycles;
+    }
+    public void setMulCycles(int cycles) {
+        MUL_CYCLES = cycles;
+    }
+
+    public void setDivCycles(int cycles) {
+        DIV_CYCLES = cycles;
+    }
+    public void setLoadCycles(int cycles) {
+        LOAD_CYCLES = cycles;
+    }
+
+    public void setStoreCycles(int cycles) {
+        STORE_CYCLES = cycles;
+    }
+
+    public void setBNEZCycles(int cycles) {
+        BNEZ_CYCLES = cycles;
+    }
+
+    public void setAddSubStations(int stations) {
+        MAX_ADD_STATIONS = stations;
+    }
+
+    public void setMulDivStations(int stations) {
+        MAX_MUL_DIV_STATIONS = stations;
+    }
+
+    public void setLoadBuffers(int buffers) {
+        MAX_LOAD_BUFFERS = buffers;
+    }
+
+    public void setStoreBuffers(int buffers) {
+        MAX_STORE_BUFFERS = buffers;
+    }
+
+    public void setInstructionFilePath(String filePath) {
+        instructionFilePath = filePath;
+    }
+
     public static LoadStoreBuffer[] getStoreBuffers() {
         return storeBuffers;
     }
