@@ -40,7 +40,7 @@ public class RegisterFile {
 
         return Double.parseDouble(floatingRegs[Integer.parseInt(nameAndOrIndex)].getValue());
     }
-    public void setR(int index, Integer value) {
+    public void setR(int index, Long value) {
         integerRegs[index].setValue(value.toString());
     }
     public void setF(int index, Double value) {
