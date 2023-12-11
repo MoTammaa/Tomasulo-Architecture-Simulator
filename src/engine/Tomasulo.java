@@ -519,7 +519,7 @@ public class Tomasulo {
             printStatus();
 
             currentCycle++;
-            if (currentCycle > 50) {
+            if (currentCycle > 100) {
                 System.err.println("Simulation is taking too long. Terminating...");
                 break;
             }
