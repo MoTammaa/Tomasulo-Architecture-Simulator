@@ -18,6 +18,7 @@ public class TomasuloInputs extends JFrame {
         // Set the window size to the monitor's height and width
         setSize(screenWidth, screenHeight);
         setLocationRelativeTo(null);
+        setExtendedState(JFrame.MAXIMIZED_BOTH);
 
 
         JPanel panel = new JPanel();
@@ -109,18 +110,18 @@ public class TomasuloInputs extends JFrame {
         JButton submitButton = new JButton("Run");
         submitButton.addActionListener(e -> {
 
-            int addCycles = Integer.parseInt(textFieldsGroup1[0].getText());
-            int subCycles = Integer.parseInt(textFieldsGroup1[1].getText());
-            int mulCycles = Integer.parseInt(textFieldsGroup1[2].getText());
-            int divCycles = Integer.parseInt(textFieldsGroup1[3].getText());
-            int loadCycles = Integer.parseInt(textFieldsGroup1[4].getText());
-            int storeCycles = Integer.parseInt(textFieldsGroup1[5].getText());
-            int bnezCycles = Integer.parseInt(textFieldsGroup1[6].getText());
-            int addSubStations = Integer.parseInt(textFieldsGroup2[0].getText());
-            int mulDivStations = Integer.parseInt(textFieldsGroup2[1].getText());
-            int loadStoreBuffers = Integer.parseInt(textFieldsGroup2[2].getText());
+            int addCycles = (textFieldsGroup1[0].getText().isEmpty())? Tomasulo.ADD_CYCLES : Integer.parseInt(textFieldsGroup1[0].getText());
+            int subCycles = (textFieldsGroup1[1].getText().isEmpty())? Tomasulo.SUB_CYCLES :  Integer.parseInt(textFieldsGroup1[1].getText());
+            int mulCycles = (textFieldsGroup1[2].getText().isEmpty())? Tomasulo.MUL_CYCLES :  Integer.parseInt(textFieldsGroup1[2].getText());
+            int divCycles = (textFieldsGroup1[3].getText().isEmpty())? Tomasulo.DIV_CYCLES :  Integer.parseInt(textFieldsGroup1[3].getText());
+            int loadCycles = (textFieldsGroup1[4].getText().isEmpty())? Tomasulo.LOAD_CYCLES :  Integer.parseInt(textFieldsGroup1[4].getText());
+            int storeCycles = (textFieldsGroup1[5].getText().isEmpty())? Tomasulo.STORE_CYCLES :  Integer.parseInt(textFieldsGroup1[5].getText());
+            int bnezCycles = (textFieldsGroup1[6].getText().isEmpty())? Tomasulo.BNEZ_CYCLES :  Integer.parseInt(textFieldsGroup1[6].getText());
+            int addSubStations = (textFieldsGroup2[0].getText().isEmpty())? Tomasulo.MAX_ADD_STATIONS :  Integer.parseInt(textFieldsGroup2[0].getText());
+            int mulDivStations = (textFieldsGroup2[1].getText().isEmpty())? Tomasulo.MAX_MUL_DIV_STATIONS :  Integer.parseInt(textFieldsGroup2[1].getText());
+            int loadStoreBuffers = (textFieldsGroup2[2].getText().isEmpty())? Tomasulo.MAX_LOAD_BUFFERS :  Integer.parseInt(textFieldsGroup2[2].getText());
 
-            String instructionsFile = textFieldInstructionsFile.getText();
+            String instructionsFile =(textFieldInstructionsFile.getText().isEmpty())? "ins1": textFieldInstructionsFile.getText();
 
 
             Tomasulo tomasulo = new Tomasulo();
@@ -145,10 +146,10 @@ public class TomasuloInputs extends JFrame {
             for (int i = 0; i < 32; i++) {
 
 
-                if (!textFieldsGroup3[i].getText().equals(""))
+                if (!textFieldsGroup3[i].getText().isEmpty())
                     Tomasulo.getRegisterFile().setR(i, Long.parseLong(textFieldsGroup3[i].getText()));
 
-                if (!textFieldsGroup4[i].getText().equals(""))
+                if (!textFieldsGroup4[i].getText().isEmpty())
                     Tomasulo.getRegisterFile().setF(i, Double.parseDouble(textFieldsGroup4[i].getText()));
             }
             dispose();

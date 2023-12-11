@@ -16,10 +16,10 @@ import view.TomasuloInputs;
 
 public class Tomasulo {
 
-    public static int LOAD_CYCLES, STORE_CYCLES, ADD_CYCLES, SUB_CYCLES
-                            , MUL_CYCLES, DIV_CYCLES, BNEZ_CYCLES, ADDI_CYCLES = 1;
-    public static int MAX_LOAD_BUFFERS, MAX_STORE_BUFFERS
-                        , MAX_ADD_STATIONS, MAX_MUL_DIV_STATIONS ;
+    public static int LOAD_CYCLES = 2, STORE_CYCLES = 2, ADD_CYCLES = 2, SUB_CYCLES = 2
+            , MUL_CYCLES = 5, DIV_CYCLES = 6, BNEZ_CYCLES = 1, ADDI_CYCLES = 1;
+    public static int MAX_LOAD_BUFFERS = 2, MAX_STORE_BUFFERS = 2
+            , MAX_ADD_STATIONS = 2, MAX_MUL_DIV_STATIONS = 2;
     private static final int MAX_INSTRUCTIONS = 100, MAX_MEMORY = 500;
 
 
