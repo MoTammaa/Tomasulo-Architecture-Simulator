@@ -98,6 +98,7 @@ public class TomasuloInputs extends JFrame {
 
         JLabel labelInstructionsFile = new JLabel("Instructions Text File Name (without an extension): ");
         JTextField textFieldInstructionsFile = new JTextField(20);
+        textFieldInstructionsFile.setEnabled(false);
         gbc.gridx = 0;
         gbc.gridy = 73;
         gbc.anchor = GridBagConstraints.LINE_END;
@@ -121,7 +122,7 @@ public class TomasuloInputs extends JFrame {
             int mulDivStations = (textFieldsGroup2[1].getText().isEmpty())? Tomasulo.MAX_MUL_DIV_STATIONS :  Integer.parseInt(textFieldsGroup2[1].getText());
             int loadStoreBuffers = (textFieldsGroup2[2].getText().isEmpty())? Tomasulo.MAX_LOAD_BUFFERS :  Integer.parseInt(textFieldsGroup2[2].getText());
 
-            String instructionsFile =(textFieldInstructionsFile.getText().isEmpty())? "ins1": textFieldInstructionsFile.getText();
+            String instructionsFile =(textFieldInstructionsFile.getText().isEmpty())? "Program": textFieldInstructionsFile.getText();
 
 
             Tomasulo tomasulo = new Tomasulo();

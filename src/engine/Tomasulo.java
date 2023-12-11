@@ -11,6 +11,7 @@ import caches.*;
 import instruction.*;
 import registerFile.*;
 import reservationStations.*;
+import view.CodeIDE;
 import view.Tables;
 import view.TomasuloInputs;
 
@@ -36,7 +37,7 @@ public class Tomasulo {
     private static int currentCycle = 0;
 
     public static void main(String[] args) {
-        TomasuloInputs.processTomasuloInputs();
+        CodeIDE.startCoding();
     }
   public static void initializeTomasulo()  {
         loadBuffers = new LoadStoreBuffer[MAX_LOAD_BUFFERS];
