@@ -163,8 +163,10 @@ public class TomasuloInputs extends JFrame {
         panel.add(submitButton, gbc);
 
 
-        add(panel);
+        JScrollPane scrollPane = new JScrollPane(panel);
+        scrollPane.getVerticalScrollBar().setUnitIncrement(8);
 
+        add(scrollPane);
 
         setVisible(true);
     }
