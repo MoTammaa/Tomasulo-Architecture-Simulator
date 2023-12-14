@@ -13,7 +13,6 @@ import registerFile.*;
 import reservationStations.*;
 import view.CodeIDE;
 import view.Tables;
-import view.TomasuloInputs;
 
 public class Tomasulo {
 
