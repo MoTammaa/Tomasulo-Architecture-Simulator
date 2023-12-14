@@ -3,6 +3,7 @@ package reservationStations;
 import engine.Tomasulo;
 import instruction.ITypes;
 import instruction.Instruction;
+import registerFile.Register;
 
 public class ReservationStation extends Station {
     private final String reservationStationName;
@@ -48,7 +49,6 @@ public class ReservationStation extends Station {
         }
 
         Tomasulo.getRegisterFile().setRegisterStatus(instruction.getRd(), reservationStationName);
-
     }
 
     public void setInstructionType(ITypes instructionType) {
@@ -126,8 +126,10 @@ public class ReservationStation extends Station {
 
     public void writeBack() {
         instruction.setWriteBack(Tomasulo.getCurrentCycle());
-        Tomasulo.getRegisterFile().setRegisterValue(instruction.getRd(), instruction.execute(this));
-        Tomasulo.getRegisterFile().setRegisterStatus(instruction.getRd(), "0");
+        if (Tomasulo.getRegisterFile().getRegisterStatus(instruction.getRd()).equals(reservationStationName) || instruction.getRd().equals("B")){
+            Tomasulo.getRegisterFile().setRegisterValue(instruction.getRd(), instruction.execute(this));
+            Tomasulo.getRegisterFile().setRegisterStatus(instruction.getRd(), "0");
+        }
 
         if (instructionType == ITypes.BNEZ && Tomasulo.getRegisterFile().getRegister("B").equals("1")) {
             Tomasulo.getRegisterFile().setBFalse();

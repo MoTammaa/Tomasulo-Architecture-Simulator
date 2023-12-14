@@ -65,6 +65,8 @@ public class Tomasulo {
         Dcache = new DataCache(MAX_MEMORY);
         labels = new HashMap<>();
         Tomasulo.loadDataFromFile(instructionFilePath + ".txt");
+        Dcache.setM(100, "92");
+        Dcache.setM(200, "45");
     }
 
     // getters and setters

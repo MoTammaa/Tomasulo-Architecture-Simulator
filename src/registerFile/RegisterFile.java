@@ -65,6 +65,15 @@ public class RegisterFile {
             return floatingRegs[Integer.parseInt(registerName.substring(1))].getValue();
         }
     }
+    public String getRegisterStatus(String registerName) { // registerName = "R0" or "F0" // Floating or Integers
+        if (registerName.charAt(0) == 'R') {
+            return integerRegs[Integer.parseInt(registerName.substring(1))].getRegisterStatus();
+        } else if ( registerName.charAt(0) == 'B') {
+            return branch.getValue();
+        } else {
+            return floatingRegs[Integer.parseInt(registerName.substring(1))].getRegisterStatus();
+        }
+    }
 
     public void setRegisterStatus(String registerName, String registerStatus) { // registerName = "R0" or "F0" // Floating or Integers
         if (registerName.charAt(0) == 'R') {

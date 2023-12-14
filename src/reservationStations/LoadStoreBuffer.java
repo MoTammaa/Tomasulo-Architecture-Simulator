@@ -3,6 +3,7 @@ package reservationStations;
 import engine.Tomasulo;
 import instruction.ITypes;
 import instruction.Instruction;
+import registerFile.Register;
 
 public class LoadStoreBuffer extends Station{
     private final String bufferName;
@@ -90,8 +91,10 @@ public class LoadStoreBuffer extends Station{
     public void writeBack() {
         instruction.setWriteBack(Tomasulo.getCurrentCycle());
         if (bufferName.startsWith("L")) { // Load: write to register file
-            Tomasulo.getRegisterFile().setRegisterValue(instruction.getRd(), instruction.execute(this));
-            Tomasulo.getRegisterFile().setRegisterStatus(instruction.getRd(), "0");
+            if (Tomasulo.getRegisterFile().getRegisterStatus(instruction.getRd()).equals(bufferName)){
+                Tomasulo.getRegisterFile().setRegisterValue(instruction.getRd(), instruction.execute(this));
+                Tomasulo.getRegisterFile().setRegisterStatus(instruction.getRd(), "0");
+            }
         } else { // Store: write to memory
             Tomasulo.getDataCache().setM(address, fu);
         }
