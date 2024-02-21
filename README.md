@@ -70,35 +70,36 @@ The simulator supports the following instructions:
  by the program have been covered above.
 
 **Program Structure**
-
-src
-│
-├── caches
-│ ├── Cache
-│ ├── DataCache
-│ └── InstructionCache
-│
-├── engine
-│ └── Tomasulo
-│
-├── Instruction
-│ ├── Instruction
-│ ├── InstructionStatus
-│ └── ITypes
-│
-├── registerFile
-│ ├── Register
-│ └── RegisterFile
-│
-├── reservationStations
-│ ├── LoadStoreBuffer
-│ ├── ReservationStation
-│ └── Station
-│
-├── View
-│ └── Tables
-│
-└── <Instruction Text Files, i.e ins1.txt>
+ ```bash
+   src
+   │
+   ├── caches
+   │ ├── Cache
+   │ ├── DataCache
+   │ └── InstructionCache
+   │
+   ├── engine
+   │ └── Tomasulo
+   │
+   ├── Instruction
+   │ ├── Instruction
+   │ ├── InstructionStatus
+   │ └── ITypes
+   │
+   ├── registerFile
+   │ ├── Register
+   │ └── RegisterFile
+   │
+   ├── reservationStations
+   │ ├── LoadStoreBuffer
+   │ ├── ReservationStation
+   │ └── Station
+   │
+   ├── View
+   │ └── Tables
+   │
+   └── <Instruction Text Files, i.e ins1.txt>
+```
 
 **Program Component Overview**
 
@@ -128,14 +129,16 @@ We tried to devise a number of test cases that include all possible hazards (nam
 You can, of course, devise your own test cases (which we pray will not break our program). The following are (most) of the test cases we've used. Unfortunately, we deleted or overwrote some of the cases we had used.
 
 **Set 1:**
+```MIPS
 MUL R3, R1, R2
 ADD R5, R3, R4
 ADD R7, R2, R6
 ADD R10, R8, R9
 MUL R11, R7, R10
 ADD R5, R5, R11
-
+```
 **Set 2:**
+```MIPS
 LOAD R1 ,200
 ADD F1, F2, F3
 SUB F3, F1, F2
@@ -144,8 +147,9 @@ DIV F3, F1, F2
 ADD F1, F2, F3
 SUB F3, F1, F2
 STORE F3, 499
-
+```
 **Set 3:**
+```MIPS
 ADD F1, F1, F11
 ONE: SUB F3,F1,F2
 MUL F2, F1, F3
@@ -154,8 +158,9 @@ ADD F1, F1, F11
 BNEZ F1, ONE
 SUB F3, F1, F2
 BNEZ F5, TWO
-
+```
 **Set 4:**
+```MIPS
 ADD F2, F4, F6
 LOAD F8, 0(R1)
 SUB F10, F2, F12
@@ -166,3 +171,4 @@ ADD F22, F16, F24
 Label: SUB F26, F12, F28
 ADD R5, R2, R3
 STORE R5, 0(R1)
+```
